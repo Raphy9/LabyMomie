@@ -108,7 +108,7 @@ void setup() {
   leftArm.translate(0, -60 * stepHeight, -rGlobal);  // Positionnement du bras gauche
   armsGroup.addChild(leftArm);
   
-  // Bras droit : on fait une copie profonde du bras déjà construit
+  // Bras droit :
   PShape rightArm = buildArm();
   rightArm.translate(0, -60 * stepHeight, rGlobal);  // Positionnement du bras droit
   armsGroup.addChild(rightArm);

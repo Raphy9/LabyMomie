@@ -85,16 +85,26 @@ void setup() {
   float rEye = rGlobal + rGlobal * 0.11 - 5 * tHead;
   float yEye = iEye * stepHeight;
   float zOffset = 8;
-  
-  PShape leftEye = createShape(SPHERE, 4.5);
+    
+  PShape leftEye = createShape(SPHERE, 3.5);
   leftEye.setFill(color(0));
   leftEye.translate(rEye, -yEye, zOffset);
   eyesGroup.addChild(leftEye);
   
-  PShape rightEye = createShape(SPHERE, 4.5);
+  PShape wLeftEye = createShape(SPHERE, 6);
+  wLeftEye.setFill(color(255));
+  wLeftEye.translate(rEye-3, -yEye, zOffset);
+  eyesGroup.addChild(wLeftEye);
+  
+  PShape rightEye = createShape(SPHERE, 3.5);
   rightEye.setFill(color(0));
   rightEye.translate(rEye, -yEye, -zOffset);
   eyesGroup.addChild(rightEye);
+  
+  PShape wRightEye = createShape(SPHERE, 6);
+  wRightEye.setFill(color(255));
+  wRightEye.translate(rEye-3, -yEye, -zOffset);
+  eyesGroup.addChild(wRightEye);
   
   mummyGroup.addChild(eyesGroup);
   
@@ -108,7 +118,7 @@ void setup() {
   leftArm.translate(0, -60 * stepHeight, -rGlobal);  // Positionnement du bras gauche
   armsGroup.addChild(leftArm);
   
-  // Bras droit :
+  // Bras droit : 
   PShape rightArm = buildArm();
   rightArm.translate(0, -60 * stepHeight, rGlobal);  // Positionnement du bras droit
   armsGroup.addChild(rightArm);
@@ -117,7 +127,7 @@ void setup() {
 }
 
 PShape buildArm() {
-  // Paramètres spécifiques aux bras
+  // Paramètres du bras
   int armSegments = 30;       // Nombre de segments le long du bras
   float armBase = 15;         // Rayon de départ (au niveau de l'épaule)
   float armTip = 10;          // Rayon à l'extrémité du bras

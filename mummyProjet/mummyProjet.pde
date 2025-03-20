@@ -7,6 +7,9 @@ float bandOffset = 5.0;   // Décalage en angle pour l'épaisseur des bandes
 float stepHeight = 3.0;   // Écart vertical entre les anneaux (hauteur)
 float rGlobal = 30.0;     // Rayon de base
 
+// Système de particules
+ArrayList<Particle> particles = new ArrayList<Particle>();
+
 void setup() {
   size(800, 600, P3D);
   noStroke();
@@ -109,7 +112,7 @@ void setup() {
   mummyGroup.addChild(eyesGroup);
   
   // ==========================================================
-  // 4) Construction des Bras
+  // 4) Construction des Bras (une seule fois)
   // ==========================================================
   PShape armsGroup = createShape(GROUP);
   
@@ -118,7 +121,7 @@ void setup() {
   leftArm.translate(0, -60 * stepHeight, -rGlobal);  // Positionnement du bras gauche
   armsGroup.addChild(leftArm);
   
-  // Bras droit : 
+  // Bras droit
   PShape rightArm = buildArm();
   rightArm.translate(0, -60 * stepHeight, rGlobal);  // Positionnement du bras droit
   armsGroup.addChild(rightArm);
@@ -175,5 +178,74 @@ void draw() {
   rotateX(-PI/6);
   rotateY(frameCount * 0.02);
   
+  // Affichage de la momie
   shape(mummyGroup);
+  
+  // Mise à jour et affichage des particules autour de la momie
+  updateParticles();
+  displayParticles();
+}
+
+// ==========================================================
+// Système de particules
+// ==========================================================
+void updateParticles() {
+  // On ajoute quelques particules chaque frame
+  for (int i = 0; i < 5; i++) {
+    // On génère une position aléatoire sur une sphère autour du centre de la momie
+    PVector spawn = PVector.random3D();
+    spawn.mult(random(rGlobal * 0.8, rGlobal * 1.5));
+    particles.add(new Particle(spawn));
+  }
+  
+  // Mise à jour et suppression des particules trop vieilles
+  for (int i = particles.size()-1; i >= 0; i--) {
+    Particle p = particles.get(i);
+    p.update();
+    if (p.isDead()) {
+      particles.remove(i);
+    }
+  }
+}
+
+void displayParticles() {
+  // On affiche toutes les particules
+  for (Particle p : particles) {
+    p.display();
+  }
+}
+
+// ==========================================================
+// Classe Particle
+// ==========================================================
+class Particle {
+  PVector pos;
+  PVector vel;
+  float lifespan;
+  
+  Particle(PVector pos) {
+    this.pos = pos.copy();
+    // Vélocité aléatoire pour donner un léger mouvement
+    vel = PVector.random3D();
+    vel.mult(random(0.5, 2));
+    lifespan = 255;
+  }
+  
+  void update() {
+    pos.add(vel);
+    lifespan -= 2;
+  }
+  
+  void display() {
+    pushMatrix();
+    translate(pos.x, pos.y, pos.z);
+    noStroke();
+    fill(194, 167, 144, lifespan); // Couleur avec transparence
+    sphere(2);
+    popMatrix();
+  }
+  
+  boolean isDead() {
+    return lifespan < 0;
+  }
 }

@@ -352,7 +352,6 @@ void draw() {
   if (estExterieur) {
     renderSolDesertique();
   }
-  
   renderPyramide();
   
   // Rendu des escaliers entre les niveaux

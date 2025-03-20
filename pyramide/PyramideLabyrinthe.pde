@@ -50,6 +50,7 @@ void setup() {
   textureMode(NORMAL);
   
   // Chargement des shaders
+  /* Inutile ? Pas utilisé
   try {
     shaderInterieur = loadShader("interieur.frag", "interieur.vert");
     shaderExterieur = loadShader("exterieur.frag", "exterieur.vert");
@@ -58,6 +59,7 @@ void setup() {
     println("Erreur lors du chargement des shaders: " + e.getMessage());
     println("Les shaders ne seront pas utilisés.");
   }
+  */
   
   // Initialisation des labyrinthes pour chaque niveau
   labyrinthes = new char[NIVEAUX][][];
@@ -236,11 +238,10 @@ PImage createTextureJaune(PImage original) {
 PImage createTextureSable() {
   PImage result = createImage(256, 256, RGB);
   result.loadPixels();
-  
   for (int y = 0; y < result.height; y++) {
     for (int x = 0; x < result.width; x++) {
-      float r = 240 + random(-20, 15);
-      float g = 210 + random(-20, 15);
+      float r = 240 + random(-70, 15);
+      float g = 210 + random(-70, 15);
       float b = 130 + random(-20, 15);
       
       // On ajoute du bruit pour la texture granuleuse
@@ -339,8 +340,7 @@ void draw() {
   // Configuration de l'éclairage selon la position du joueur
   if (estExterieur) {
     // Éclairage extérieur (clair)
-    ambientLight(150, 150, 130);
-    directionalLight(255, 240, 200, 0.5, 0.5, -1);
+    directionalLight(200, 200, 200, 0.5, 0.5, -1);
   } else {
     // Éclairage intérieur (sombre mais suffisant pour voir les murs)
     ambientLight(50, 50, 60);
@@ -437,13 +437,12 @@ boolean checkSiExterieur() {
 // Fonction pour rendre le sol désertique
 void renderSolDesertique() {
   pushMatrix();
-  
   // Positionner le sol en dessous de la pyramide
   translate(-TAILLE_DESERT*10, -TAILLE_DESERT*10, -5);
-  
+  directionalLight(240, 175, 44, 0.5, 0.5, -1);
   resetShader();   // sinon ça fait un sol vert bizarre 
   pushMatrix();
-  fill(224, 205, 169); // même couleur que pour les murs extérieurs.
+  fill(255, 251, 0); // même couleur que pour les murs extérieurs.
   popMatrix();
   // Appliquer la texture de sable
   texture(textureSable);
@@ -453,7 +452,6 @@ void renderSolDesertique() {
     for (int j = 0; j < TAILLE_DESERT-1; j++) {
       beginShape(QUADS);
       texture(textureSable);
-      
       vertex(i*20, j*20, hauteursSol[i][j], i/float(TAILLE_DESERT), j/float(TAILLE_DESERT));
       vertex((i+1)*20, j*20, hauteursSol[i+1][j], (i+1)/float(TAILLE_DESERT), j/float(TAILLE_DESERT));
       vertex((i+1)*20, (j+1)*20, hauteursSol[i+1][j+1], (i+1)/float(TAILLE_DESERT), (j+1)/float(TAILLE_DESERT));
@@ -462,7 +460,6 @@ void renderSolDesertique() {
       endShape();
     }
   }
-  
   popMatrix();
 }
 
@@ -474,7 +471,7 @@ void renderPyramide() {
   }
   
   // Rendu du sommet lisse de la pyramide
-  renderSommetPyramide();
+  renderPyramideLisseExterieure();
 }
 
 // Fonction pour rendre un niveau de la pyramide
@@ -494,11 +491,6 @@ void renderNiveauPyramide(int niveau) {
         // On utilise la texture jaune pour l'extérieur de la pyramide et l'entrée... mais je ne comprends pas pourquoi un bloc de mur à l'entrée est vert...
         boolean estExterieur = (i == 0 || i == labSize-1 || j == 0 || j == labSize-1);
         
-        if (estExterieur || (j == 0 && i == 1)) { // Entrée à la position (1,0)
-          texture(textureStoneJaune);
-        } else {
-          texture(textureStone);
-        }
         
         // On dessine les murs
         // Mur Nord (face avant)
@@ -619,14 +611,13 @@ void renderNiveauPyramide(int niveau) {
       popMatrix();
     }
   }
-  
-  // On dessine les bords en escalier pour l'extérieur de la pyramide : je ne sais pas trop si ça marche je n'ai pas trop testé sorry...
+  /*
+  // On dessine les bords en escalier pour l'extérieur de la pyramide
   if (niveau > 0) {
     int niveauPrecedent = niveau - 1;
     int labSizePrecedent = LAB_SIZES[niveauPrecedent];
     int decalagePrecedent = DECALAGES[niveauPrecedent];
     float hauteurPrecedente = HAUTEURS_NIVEAUX[niveauPrecedent];
-    
     // Dessin des bords en escalier
     for (int j = 0; j < labSizePrecedent; j++) {
       for (int i = 0; i < labSizePrecedent; i++) {
@@ -645,6 +636,7 @@ void renderNiveauPyramide(int niveau) {
             
             // Dessiner le dessus du bloc (visible depuis l'extérieur)
             beginShape(QUADS);
+            fill(224, 205, 169); // Permet d'éviter d'avoir un ton bleuâtre sur la moitié de la pyramide (lié au sol peut être)
             texture(textureStoneJaune);
             vertex(0, 0, 20, 0, 0);
             vertex(20, 0, 20, 1, 0);
@@ -658,7 +650,55 @@ void renderNiveauPyramide(int niveau) {
       }
     }
   }
+  */
 }
+
+void renderPyramideLisseExterieure() {
+  // Taille de base : la pyramide la plus large fait 21 cases × 20 unités = 420
+  float baseSize = 21 * 20;
+  // On place le sommet à 200 en Z (comme HAUTEUR_SOMMET)
+  float apexZ = 300;
+
+  pushMatrix();
+  noStroke();
+
+textureWrap(REPEAT);
+  // Face 1 (devant)
+  beginShape(TRIANGLES);
+    texture(textureStoneJaune);
+    // On mappe la texture comme on veut (u,v). Ici, simple.
+    vertex(0,        0,        20, 0,  0);
+    vertex(baseSize, 0,        20, 20,  0);
+    vertex(baseSize/2, baseSize/2, apexZ,10,  20);
+  endShape();
+
+  // Face 2 (droite)
+  beginShape(TRIANGLES);
+    texture(textureStoneJaune);
+    vertex(baseSize, 0,     20,     0,   0);
+    vertex(baseSize, baseSize, 20, 20,   0);
+    vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
+  endShape();
+
+  // Face 3 (arrière)
+  beginShape(TRIANGLES);
+    texture(textureStoneJaune);
+    vertex(baseSize, baseSize, 20, 0,   0);
+    vertex(0,        baseSize, 20, 20,   0);
+    vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
+  endShape();
+
+  // Face 4 (gauche)
+  beginShape(TRIANGLES);
+    texture(textureStoneJaune);
+    vertex(0, baseSize, 20,     0,   0);
+    vertex(0, 0,        20,     20,   0);
+    vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
+  endShape();
+
+  popMatrix();
+}
+
 
 // Fonction pour rendre le sommet lisse de la pyramide
 void renderSommetPyramide() {
@@ -778,8 +818,8 @@ void keyPressed() {
     oldPosX = posX;
     oldPosY = posY;
     oldPosZ = posZ;
-    newPosX += dirX * 0.6;
-    newPosY += dirY * 0.6;
+    newPosX += dirX * 1;
+    newPosY += dirY * 1;
     animMode = 1;
     anim = 20;
   }
@@ -788,8 +828,8 @@ void keyPressed() {
     oldPosX = posX;
     oldPosY = posY;
     oldPosZ = posZ;
-    newPosX -= dirX * 0.6;
-    newPosY -= dirY * 0.6;
+    newPosX -= dirX * 1;
+    newPosY -= dirY * 1;
     animMode = 1;
     anim = 20;
   }

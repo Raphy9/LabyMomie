@@ -671,6 +671,15 @@ textureWrap(REPEAT);
     vertex(baseSize, 0,        20, 20,  0);
     vertex(baseSize/2, baseSize/2, apexZ,10,  20);
   endShape();
+  
+  // Face 1 (devant)
+  beginShape(TRIANGLES);
+    fill(255);
+    // On mappe la texture comme on veut (u,v). Ici, simple.
+    vertex((baseSize/2) * ((apexZ - 60) / (apexZ - 20)),         (baseSize/2) * ((apexZ - 60) / (apexZ - 20)),        apexZ-40, 0,  0);
+    vertex(baseSize - (baseSize/2) * ((apexZ - 60) / (apexZ - 20)),  (baseSize/2) * ((apexZ - 60) / (apexZ - 20)),        apexZ-40, 20,  0);
+    vertex(baseSize/2, baseSize/2, apexZ+1,10,  20);
+  endShape();
 
   // Face 2 (droite)
   beginShape(TRIANGLES);
@@ -678,6 +687,14 @@ textureWrap(REPEAT);
     vertex(baseSize, 0,     20,     0,   0);
     vertex(baseSize, baseSize, 20, 20,   0);
     vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
+  endShape();
+  
+  // Face 2 (droite)
+  beginShape(TRIANGLES);
+    fill(255);
+    vertex(baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),  (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),        apexZ-40, 0, 0);
+    vertex(baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),  baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)), apexZ-40, 20, 0);
+    vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
 
   // Face 3 (arrière)
@@ -687,13 +704,29 @@ textureWrap(REPEAT);
     vertex(0,        baseSize, 20, 20,   0);
     vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
   endShape();
+  
+  // Face 3 (arrière)
+  beginShape(TRIANGLES);
+    fill(255);
+    vertex(baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),  baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)), apexZ-40, 0, 0);
+    vertex((baseSize/2) * ((apexZ - 60)/(apexZ - 20)),         baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)), apexZ-40, 20, 0);
+    vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
+  endShape();
 
-  // Face 4 (gauche)
+   // Face 4 (gauche)
   beginShape(TRIANGLES);
     texture(textureStoneJaune);
     vertex(0, baseSize, 20,     0,   0);
     vertex(0, 0,        20,     20,   0);
     vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
+  endShape();
+  
+  // Face 4 (gauche)
+  beginShape(TRIANGLES);
+    fill(255);
+    vertex((baseSize/2) * ((apexZ - 60)/(apexZ - 20)),         baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)), apexZ-40, 0, 0);
+    vertex((baseSize/2) * ((apexZ - 60)/(apexZ - 20)),         (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),        apexZ-40, 20, 0);
+    vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
 
   popMatrix();

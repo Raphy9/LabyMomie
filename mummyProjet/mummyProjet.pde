@@ -279,3 +279,139 @@ class Particle {
     return lifespan < 0;
   }
 }
+
+PShape createMummy() {
+  PShape mummyGroup = createShape(GROUP);
+  mummyGroup.setName("mummyGroup");
+
+  // Création du groupe global de la momie
+  mummyGroup = createShape(GROUP);
+  mummyGroup.setName("mummyGroup");
+  
+  // ==========================================================
+  // 1) Construction du Corps (i de 0 à 64)
+  // ==========================================================
+  PShape bodyGroup = createShape(GROUP);
+  bodyGroup.setName("bodyGroup");
+  for (int b = 0; b < numBands; b++) {
+    float globalOffset = TWO_PI * b / numBands;
+    PShape bandShape = createShape();
+    bandShape.beginShape(QUAD_STRIP);
+    bandShape.noStroke();
+    for (int i = 0; i <= 64; i++) {
+      float t = map(i, 0, 64, 0, 1);
+      float r = rGlobal + 5 * sin(t * PI);
+      float angle = i * angleStep + globalOffset;
+      float y = i * stepHeight;
+      
+      float x1 = r * cos(angle);
+      float z1 = r * sin(angle);
+      float x2 = r * cos(angle + bandOffset);
+      float z2 = r * sin(angle + bandOffset);
+      
+      float c = map(noise(i * 0.1 + b), 0, 1, 200, 255);
+      bandShape.fill(c, c * 0.75, c * 0.5);
+      
+      bandShape.vertex(x1, -y, z1);
+      bandShape.vertex(x2, -y, z2);
+    }
+    bandShape.endShape();
+    bodyGroup.addChild(bandShape);
+  }
+  mummyGroup.addChild(bodyGroup);
+  
+  // ==========================================================
+  // 2) Construction de la Tête (i de 64 à 84)
+  // ==========================================================
+  PShape headGroup = createShape(GROUP);
+  headGroup.setName("headGroup");
+  for (int b = 0; b < numBands; b++) {
+    float globalOffset = TWO_PI * b / numBands;
+    PShape bandShape = createShape();
+    bandShape.beginShape(QUAD_STRIP);
+    bandShape.noStroke();
+    for (int i = 64; i <= 84; i++) {
+      float tHead = map(i, 64, 84, 0, 1);
+      float r = rGlobal + 0.25 * rGlobal - 5 * tHead;
+      float angle = i * angleStep + globalOffset;
+      float y = i * stepHeight;
+      
+      float x1 = r * cos(angle);
+      float z1 = r * sin(angle);
+      float x2 = r * cos(angle + bandOffset);
+      float z2 = r * sin(angle + bandOffset);
+      
+      float c = map(noise(i * 0.1 + b), 0, 1, 200, 255);
+      bandShape.fill(c, c * 0.75, c * 0.5);
+      
+      bandShape.vertex(x1, -y, z1);
+      bandShape.vertex(x2, -y, z2);
+    }
+    bandShape.endShape();
+    headGroup.addChild(bandShape);
+  }
+  mummyGroup.addChild(headGroup);
+  
+  // ==========================================================
+  // 3) Construction des Yeux
+  // ==========================================================
+  PShape eyesGroup = createShape(GROUP);
+  eyesGroup.setName("eyesGroup");
+  
+  float iEye = 75;
+  float tHead = map(iEye, 64, 84, 0, 1);
+  float rEye = rGlobal + rGlobal * 0.11 - 5 * tHead;
+  float yEye = iEye * stepHeight;
+  float zOffset = 8;
+    
+  PShape leftEye = createShape(SPHERE, 3.5);
+  leftEye.setName("leftEye");
+  leftEye.setFill(color(0));
+  leftEye.translate(rEye, -yEye, zOffset);
+  eyesGroup.addChild(leftEye);
+  
+  PShape wLeftEye = createShape(SPHERE, 6);
+  wLeftEye.setName("wLeftEye");
+  wLeftEye.setFill(color(255));
+  wLeftEye.translate(rEye-3, -yEye, zOffset);
+  eyesGroup.addChild(wLeftEye);
+  
+  PShape rightEye = createShape(SPHERE, 3.5);
+  rightEye.setName("rightEye");
+  rightEye.setFill(color(0));
+  rightEye.translate(rEye, -yEye, -zOffset);
+  eyesGroup.addChild(rightEye);
+  
+  PShape wRightEye = createShape(SPHERE, 6);
+  wRightEye.setName("wRightEye");
+  wRightEye.setFill(color(255));
+  wRightEye.translate(rEye-3, -yEye, -zOffset);
+  eyesGroup.addChild(wRightEye);
+  
+  mummyGroup.addChild(eyesGroup);
+  
+  // ==========================================================
+  // 4) Construction des Bras
+  // ==========================================================
+  PShape armsGroup = createShape(GROUP);
+  armsGroup.setName("armsGroup");
+  
+  // Bras gauche
+  PShape leftArm = buildArm(); 
+  leftArm.setName("leftArm");
+  leftArm.translate(0, -60 * stepHeight, -rGlobal);  // Positionnement du bras gauche
+  armsGroup.addChild(leftArm);
+    
+  
+  // Bras droit
+  PShape rightArm = buildArm();
+  rightArm.setName("rightArm");
+  rightArm.translate(0, -60 * stepHeight, rGlobal);  // Positionnement du bras droit
+  armsGroup.addChild(rightArm);
+  
+  mummyGroup.addChild(armsGroup);
+  
+
+
+  return mummyGroup;
+}

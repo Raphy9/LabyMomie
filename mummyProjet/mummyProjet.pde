@@ -2,7 +2,7 @@ PShape mummyGroup;  // Le groupe global de la momie
 
 // Paramètres généraux (corps, tête, etc.)
 int numBands   = 5;       // Nombre de bandes spirales
-float angleStep = 0.3;    // Incrément d'angle par anneau
+float angleStep = 0.8;    // Incrément d'angle par anneau
 float bandOffset = 5.0;   // Décalage en angle pour l'épaisseur des bandes
 float stepHeight = 3.0;   // Écart vertical entre les anneaux (hauteur)
 float rGlobal = 30.0;     // Rayon de base
@@ -16,11 +16,13 @@ void setup() {
   
   // Création du groupe global de la momie
   mummyGroup = createShape(GROUP);
+  mummyGroup.setName("mummyGroup");
   
   // ==========================================================
   // 1) Construction du Corps (i de 0 à 64)
   // ==========================================================
   PShape bodyGroup = createShape(GROUP);
+  bodyGroup.setName("bodyGroup");
   for (int b = 0; b < numBands; b++) {
     float globalOffset = TWO_PI * b / numBands;
     PShape bandShape = createShape();
@@ -52,6 +54,7 @@ void setup() {
   // 2) Construction de la Tête (i de 64 à 84)
   // ==========================================================
   PShape headGroup = createShape(GROUP);
+  headGroup.setName("headGroup");
   for (int b = 0; b < numBands; b++) {
     float globalOffset = TWO_PI * b / numBands;
     PShape bandShape = createShape();
@@ -83,6 +86,8 @@ void setup() {
   // 3) Construction des Yeux
   // ==========================================================
   PShape eyesGroup = createShape(GROUP);
+  eyesGroup.setName("eyesGroup");
+  
   float iEye = 75;
   float tHead = map(iEye, 64, 84, 0, 1);
   float rEye = rGlobal + rGlobal * 0.11 - 5 * tHead;
@@ -90,21 +95,25 @@ void setup() {
   float zOffset = 8;
     
   PShape leftEye = createShape(SPHERE, 3.5);
+  leftEye.setName("leftEye");
   leftEye.setFill(color(0));
   leftEye.translate(rEye, -yEye, zOffset);
   eyesGroup.addChild(leftEye);
   
   PShape wLeftEye = createShape(SPHERE, 6);
+  wLeftEye.setName("wLeftEye");
   wLeftEye.setFill(color(255));
   wLeftEye.translate(rEye-3, -yEye, zOffset);
   eyesGroup.addChild(wLeftEye);
   
   PShape rightEye = createShape(SPHERE, 3.5);
+  rightEye.setName("rightEye");
   rightEye.setFill(color(0));
   rightEye.translate(rEye, -yEye, -zOffset);
   eyesGroup.addChild(rightEye);
   
   PShape wRightEye = createShape(SPHERE, 6);
+  wRightEye.setName("wRightEye");
   wRightEye.setFill(color(255));
   wRightEye.translate(rEye-3, -yEye, -zOffset);
   eyesGroup.addChild(wRightEye);
@@ -112,29 +121,34 @@ void setup() {
   mummyGroup.addChild(eyesGroup);
   
   // ==========================================================
-  // 4) Construction des Bras (une seule fois)
+  // 4) Construction des Bras
   // ==========================================================
   PShape armsGroup = createShape(GROUP);
+  armsGroup.setName("armsGroup");
   
   // Bras gauche
-  PShape leftArm = buildArm();  
+  PShape leftArm = buildArm(); 
+  leftArm.setName("leftArm");
   leftArm.translate(0, -60 * stepHeight, -rGlobal);  // Positionnement du bras gauche
   armsGroup.addChild(leftArm);
+    
   
   // Bras droit
   PShape rightArm = buildArm();
+  rightArm.setName("rightArm");
   rightArm.translate(0, -60 * stepHeight, rGlobal);  // Positionnement du bras droit
   armsGroup.addChild(rightArm);
   
   mummyGroup.addChild(armsGroup);
+  
 }
 
 PShape buildArm() {
   // Paramètres du bras
-  int armSegments = 30;       // Nombre de segments le long du bras
+  int armSegments = 40;       // Nombre de segments le long du bras
   float armBase = 15;         // Rayon de départ (au niveau de l'épaule)
   float armTip = 10;          // Rayon à l'extrémité du bras
-  float stepArm = 3.0;        // Écart entre les segments le long du bras
+  float stepArm = 2.5;        // Écart entre les segments le long du bras
   
   PShape armGroup = createShape(GROUP);
   
@@ -177,9 +191,25 @@ void draw() {
   translate(width/2, height/1.5, 0);
   rotateX(-PI/6);
   rotateY(frameCount * 0.02);
+  //rotateY(-PI/2);
+  
+  float armAnim = (sin(frameCount * 0.07) + 1) / 2;  // oscille de 0 à 1
+  
+  pushMatrix();
+  rotateY(radians(armAnim*(-70)));
+  shape(mummyGroup.getChild("armsGroup").getChild("rightArm"));
+  popMatrix();
+  
+  pushMatrix();
+  rotateY(radians(armAnim*(70)));
+  shape(mummyGroup.getChild("leftArm").getChild("leftArm"));
+  popMatrix();
+
   
   // Affichage de la momie
-  shape(mummyGroup);
+  shape(mummyGroup.getChild("eyesGroup"));
+  shape(mummyGroup.getChild("headGroup"));
+  shape(mummyGroup.getChild("bodyGroup"));
   
   // Mise à jour et affichage des particules autour de la momie
   updateParticles();

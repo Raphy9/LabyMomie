@@ -13,6 +13,17 @@ ArrayList<Particle> particles = new ArrayList<Particle>();
 
 // Animation Momie
 float armAnim = 0;
+
+// Variables pour la position et le déplacement de la momie
+float mummyPosX = 3.0;  // Position X initiale de la momie dans le labyrinthe (en réalité cette valeur n'est jamais utilisée mais permet de la placer à l'entrée du labyrinthe)
+float mummyPosY = 3.0;  // Position Y initiale de la momie dans le labyrinthe (même remarque qu'en haut)
+float mummyPosZ = 0.0;   // Position Z initiale de la momie (niveau 0 de la pyramide)
+float mummyDirX = 1.0;   // Direction X initiale de la momie
+float mummyDirY = 0.0;   // Direction Y initiale de la momie
+int mummyNiveau = 0;     // Niveau actuel de la momie dans la pyramide
+float mummySpeed = 0.08; // Vitesse de déplacement de la momie
+int mummyMoveTimer = 0;  // Compteur pour changer de direction
+int mummyMoveInterval = 40; // Intervalle pour changer de direction
 //=====================================================
 
 // Quelques constantes de réglages pour les étages de la pyramide
@@ -66,18 +77,6 @@ void setup() {
   textureCiel = createTextureCiel();
   textureMode(NORMAL);
   
-  // Chargement des shaders
-  /* Inutile ? Pas utilisé
-  try {
-    shaderInterieur = loadShader("interieur.frag", "interieur.vert");
-    shaderExterieur = loadShader("exterieur.frag", "exterieur.vert");
-    println("Shaders chargés avec succès");
-  } catch (Exception e) {
-    println("Erreur lors du chargement des shaders: " + e.getMessage());
-    println("Les shaders ne seront pas utilisés.");
-  }
-  */
-  
   // Initialisaton Momie
   mummyGroup = createMummy();  
 
@@ -103,7 +102,7 @@ void setup() {
   oldPosX = posX;
   oldPosY = posY;
   oldPosZ = posZ;
-  
+  initMummyPosition();
   // Génération du sol désertique
   genererSolDesertique();
 }
@@ -290,6 +289,8 @@ void draw() {
     anim--;
   }
   
+  updateMummy();
+  
   perspective(PI/3.0, float(width)/float(height), 1, 1000);
   
   float camX, camY, camZ, lookX, lookY, lookZ;
@@ -379,6 +380,8 @@ void draw() {
   for (int niveau = 0; niveau < NIVEAUX - 1; niveau++) {
     renderEscalier(niveau);
   }
+
+  renderMummy();
   
   // On réinitialise la teinte pour les éléments suivants
   noTint();
@@ -387,19 +390,193 @@ void draw() {
   gererEscaliers();
   
   drawMiniMap();
-  
-  renderMummy();
+ 
   
 }
 
-void renderMummy() {
+// Fonction pour mettre à jour la position de la momie de manière autonome
+void updateMummy() {
+  // Mise à jour du timer pour changer de direction
+  mummyMoveTimer++;
+  if (mummyMoveTimer >= mummyMoveInterval) {
+    // Changer de direction aléatoirement
+    float angle = random(TWO_PI);
+    mummyDirX = cos(angle);
+    mummyDirY = sin(angle);
+    mummyMoveTimer = 0;
+  }
+  
+  // On calcule la nouvelle position potentielle
+  float newMummyPosX = mummyPosX + mummyDirX * mummySpeed;
+  float newMummyPosY = mummyPosY + mummyDirY * mummySpeed;
+  
+  // Vérification des collisions avec les murs
+  int cellX = int(newMummyPosX - DECALAGES[mummyNiveau]);
+  int cellY = int(newMummyPosY - DECALAGES[mummyNiveau]);
+  
+  // Variable permettant de connaître si la nouvelle position est valide (dans les limites et pas un mur)
+  boolean canMove = true;
+  
+  // Vérifier si la position est dans les limites du labyrinthe
+  if (cellX < 0 || cellX >= LAB_SIZES[mummyNiveau] || 
+      cellY < 0 || cellY >= LAB_SIZES[mummyNiveau]) {
+    canMove = false;
+  } 
+  // On vérifie si la position est un mur
+  else if (labyrinthes[mummyNiveau][cellY][cellX] == '#') {
+    canMove = false;
+  } 
+  // On vérifie si la position mènerait à l'extérieur (entrée/sortie du labyrinthe)
+  else if (cellX == 0 || cellX == LAB_SIZES[mummyNiveau]-1 || 
+           cellY == 0 || cellY == LAB_SIZES[mummyNiveau]-1) {
+    // Si c'est une entrée ou sortie,on ne permet à la momie de s'y déplacer
+    if (labyrinthes[mummyNiveau][cellY][cellX] == ' ' && 
+        ((cellX == 0) || (cellX == LAB_SIZES[mummyNiveau]-1) || 
+         (cellY == 0) || (cellY == LAB_SIZES[mummyNiveau]-1))) {
+      canMove = false;
+    }
+  }
+  else {
+    // Vérification plus précise pour éviter de traverser les murs
+    float margin = 0.3; // Marge pour éviter de traverser les murs
+    
+    // Vérifier les cellules adjacentes
+    if (newMummyPosX - (cellX + DECALAGES[mummyNiveau]) < margin && 
+        cellX > 0 && labyrinthes[mummyNiveau][cellY][cellX-1] == '#') 
+      canMove = false;
+    
+    if ((cellX + 1 + DECALAGES[mummyNiveau]) - newMummyPosX < margin && 
+        cellX < LAB_SIZES[mummyNiveau]-1 && labyrinthes[mummyNiveau][cellY][cellX+1] == '#') 
+      canMove = false;
+    
+    if (newMummyPosY - (cellY + DECALAGES[mummyNiveau]) < margin && 
+        cellY > 0 && labyrinthes[mummyNiveau][cellY-1][cellX] == '#') 
+      canMove = false;
+    
+    if ((cellY + 1 + DECALAGES[mummyNiveau]) - newMummyPosY < margin && 
+        cellY < LAB_SIZES[mummyNiveau]-1 && labyrinthes[mummyNiveau][cellY+1][cellX] == '#') 
+      canMove = false;
+  }
+  
+  // Mettre à jour la position si possible
+  if (canMove) {
+    mummyPosX = newMummyPosX;
+    mummyPosY = newMummyPosY;
+  } else {
+    // Si collision, on change de direction immédiatement
+    float angle = random(TWO_PI);
+    mummyDirX = cos(angle);
+    mummyDirY = sin(angle);
+    mummyMoveTimer = 0;
+  }
+  
+  // Si la momie est à l'extérieur alors on la replace à l'intérieur.
+  if (checkIfMummyOutside()) {
+    initMummyPosition();
+  }
+}
 
+void initMummyPosition() {
+  // On essaie plusieurs positions jusqu'à en trouver une valide.
+  for (int i = 6; i < LAB_SIZES[0] - 1; i++) {
+    for (int j = 6; j < LAB_SIZES[0] - 1; j++) {
+      float testX = i + DECALAGES[0] + 0.5;
+      float testY = j + DECALAGES[0] + 0.5;
+      
+      if (isValidMummyPosition(testX, testY, 0)) {
+        mummyPosX = testX;
+        mummyPosY = testY;
+        mummyNiveau = 0;
+        return;
+      }
+    }
+  }
+  
+  /*
+  // Si aucune position valide n'est trouvée, on pourrait utiliser une position par défaut. Bon si on fait ça, ça va mettre la momie au début du labyrinthe...
+  mummyPosX = 3.0;
+  mummyPosY = 3.0;
+  mummyNiveau = 0;
+  */
+}
+
+boolean isValidMummyPosition(float x, float y, int niveau) {
+  int cellX = int(x - DECALAGES[niveau]);
+  int cellY = int(y - DECALAGES[niveau]);
+  
+  // On commence par vérifier si la position est dans les limites du labyrinthe
+  if (cellX < 0 || cellX >= LAB_SIZES[niveau] || 
+      cellY < 0 || cellY >= LAB_SIZES[niveau]) {
+    return false;
+  } 
+  
+  // On vérifie si la position est un mur
+  if (labyrinthes[niveau][cellY][cellX] == '#') {
+    return false;
+  }
+  
+  // On vérifie si la position est sur une entrée/sortie du labyrinthe
+  if ((cellX == 0 || cellX == LAB_SIZES[niveau]-1 || 
+       cellY == 0 || cellY == LAB_SIZES[niveau]-1) && 
+      labyrinthes[niveau][cellY][cellX] == ' ') {
+    return false;
+  }
+  
+  // On vérifie pour finir les cellules adjacentes pour s'assurer qu'il y a de l'espace pour se déplacer
+  int spaceCount = 0;
+  if (cellX > 0 && labyrinthes[niveau][cellY][cellX-1] != '#') spaceCount++;
+  if (cellX < LAB_SIZES[niveau]-1 && labyrinthes[niveau][cellY][cellX+1] != '#') spaceCount++;
+  if (cellY > 0 && labyrinthes[niveau][cellY-1][cellX] != '#') spaceCount++;
+  if (cellY < LAB_SIZES[niveau]-1 && labyrinthes[niveau][cellY+1][cellX] != '#') spaceCount++;
+  
+  // La position est valide si elle a au moins 2 espaces adjacents pour se déplacer
+  return spaceCount >= 2;
+}
+
+boolean checkIfMummyOutside() {
+  int cellX = int(mummyPosX - DECALAGES[mummyNiveau]);
+  int cellY = int(mummyPosY - DECALAGES[mummyNiveau]);
+  
+  // On vérifie si la position est en dehors des limites du labyrinthe
+  if (cellX < 0 || cellX >= LAB_SIZES[mummyNiveau] || 
+      cellY < 0 || cellY >= LAB_SIZES[mummyNiveau]) {
+    return true;
+  }
+  
+  // On vérifie si la momie est sur une entrée/sortie du labyrinthe
+  if ((cellX == 0 || cellX == LAB_SIZES[mummyNiveau]-1 || 
+       cellY == 0 || cellY == LAB_SIZES[mummyNiveau]-1) && 
+      labyrinthes[mummyNiveau][cellY][cellX] == ' ') {
+    return true;
+  }
+  
+  return false;
+}
+
+void renderMummy() {
+  rotateX(-PI/2);
+  // Ne générer la momie que si elle est à l'intérieur du labyrinthe !
+  if (checkIfMummyOutside()) {
+    return;
+  }
+  
   pushMatrix();
   
-  // Choisis la position où tu veux qu'elle apparaisse dans le monde.
-  translate(width/2, height/1.5, 0);
-  rotateY(frameCount * 0.02);
-  //rotateY(-PI/2);
+  // Utiliser la position de la momie dans le labyrinthe
+  // On convertit les coordonnées du labyrinthe en coordonnées 3D
+  float mummyWorldX = (mummyPosX) * 20; // 20 unités par cellule
+  float mummyWorldY = (mummyPosY) * 20;
+  float mummyWorldZ = HAUTEURS_NIVEAUX[mummyNiveau] + 0; // Hauteur du niveau + décalage
+  
+  translate(mummyWorldX, mummyWorldZ, mummyWorldY);
+  
+  // Permet d'orienter la momie dans la direction de son déplacement
+  float angle = atan2(mummyDirY, mummyDirX);
+  rotateY(PI/2 - angle);
+  
+  // Ajuster l'échelle pour réduire la taille de la momie
+  scale(0.065);
+
   
   // Animation des bras
   armAnim = (sin(frameCount * 0.05) + 1) / 2;
@@ -422,12 +599,14 @@ void renderMummy() {
   
   popMatrix();
   
+  // Particules autour de la momie
   pushMatrix();
-  translate(width/2, height/1.5, 0);
-  updateParticles();
-  displayParticles();
+  translate(mummyWorldX, mummyWorldZ, mummyWorldY);
+  //updateParticles();
+  //displayParticles();
   popMatrix();
 }
+
 
 // Fonction pour dessiner le ciel (skybox)
 void renderCiel() {
@@ -893,6 +1072,18 @@ void drawMiniMap() {
   line(mapX + (posX-DECALAGES[niveauActuel])*cellSize, mapY + (posY-DECALAGES[niveauActuel])*cellSize, 
        mapX + (posX-DECALAGES[niveauActuel] + dirX)*cellSize, mapY + (posY-DECALAGES[niveauActuel] + dirY)*cellSize);
   noStroke();
+  
+ // On dessine ici la position de la momie (en violet)
+  if (mummyNiveau == niveauActuel) {
+    fill(255, 0, 255); // Couleur violette pour la momie
+    ellipse(mapX + (mummyPosX-DECALAGES[mummyNiveau])*cellSize, mapY + (mummyPosY-DECALAGES[mummyNiveau])*cellSize, cellSize*1.2, cellSize*1.2);
+    
+    // On dessine la direction de la momie
+    stroke(255, 165, 0); // Orange pour la direction de la momie
+    line(mapX + (mummyPosX-DECALAGES[mummyNiveau])*cellSize, mapY + (mummyPosY-DECALAGES[mummyNiveau])*cellSize, 
+         mapX + (mummyPosX-DECALAGES[mummyNiveau] + mummyDirX)*cellSize, mapY + (mummyPosY-DECALAGES[mummyNiveau] + mummyDirY)*cellSize);
+    noStroke();
+  }
   
   hint(ENABLE_DEPTH_TEST);
 }

@@ -1213,10 +1213,6 @@ void deplacerJoueur(float newPosX, float newPosY) {
 void keyPressed() {
   if (anim > 0) return;
   
-  float newPosX = posX;
-  float newPosY = posY;
-  float newPosZ = posZ;
-  
   // Touche flèche haut
   if (keyCode == 38) {
     isKeyUpPressed = true;
@@ -1233,30 +1229,6 @@ void keyPressed() {
   else if (keyCode == 39) {
     isKeyRightPressed = true;
   }
-  
-  // Déplacement vers l'avant (flèche haut)
-  if (keyCode == 38) {
-    oldPosX = posX;
-    oldPosY = posY;
-    oldPosZ = posZ;
-    newPosX += dirX * 0.25;
-    newPosY += dirY * 0.25;
-    animMode = 1;
-    anim = 4;
-  }
-  // Déplacement vers l'arrière (flèche bas)
-  else if (keyCode == 40) {
-    oldPosX = posX;
-    oldPosY = posY;
-    oldPosZ = posZ;
-    newPosX -= dirX * 0.25;
-    newPosY -= dirY * 0.25;
-    animMode = 1;
-    anim = 4;
-  }
-  // Rotation à gauche (flèche gauche) - keyCode 37 [je lai deplacer dans une fonction] rotateLeft()
-
-  // Rotation à droite (flèche droite) - keyCode 39 [je lai deplacer dans une fonction] rotateRight()
 
   // Monter (touche 'e')
   else if (key == 'e' || key == 'E') {

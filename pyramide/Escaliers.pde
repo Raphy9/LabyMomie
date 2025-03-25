@@ -1,6 +1,7 @@
 // Implémentation des escaliers entre les niveaux de la pyramide
 
 // Fonction pour rendre un escalier entre deux niveaux
+/*
 void renderEscalier(int niveauDepart) {
   int labSizeDepart = LAB_SIZES[niveauDepart];
   int labSizeArrivee = LAB_SIZES[niveauDepart + 1];
@@ -74,7 +75,7 @@ void renderEscalier(int niveauDepart) {
   
   popMatrix();
 }
-
+*/
 // Fonction pour gérer la montée/descente des escaliers
 void gererEscaliers() {
   // Vérifier si le joueur est sur un escalier montant
@@ -137,7 +138,7 @@ void animerMonteeDescente(int nouveauNiveau, float nouvellePosX, float nouvelleP
   
   // Mettre à jour le niveau actuel et la position
   niveauActuel = nouveauNiveau;
-  posX = nouvellePosX;
+  posX = nouvellePosX+0.4;
   posY = nouvellePosY;
   posZ = HAUTEURS_NIVEAUX[niveauActuel];
   

@@ -395,11 +395,6 @@ void draw() {
  } else {renderSolDesertique(false);}
   renderPyramide();
   
-  // Rendu des escaliers entre les niveaux
-  for (int niveau = 0; niveau < NIVEAUX - 1; niveau++) {
-    renderEscalier(niveau);
-  }
-
   renderMummy();
   
   // On réinitialise la teinte pour les éléments suivants

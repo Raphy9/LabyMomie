@@ -64,7 +64,7 @@ float time = 0;
 void setup() { 
   frameRate(20);
   randomSeed(2);
-  size(1000, 1000, P3D);
+  size(1920, 1080, P3D);
   
   // Chargement des textures
   textureStone = loadImage("stone.jpg");
@@ -287,6 +287,25 @@ void draw() {
   
   if (anim > 0) {
     anim--;
+  }
+  
+  // Si la touche "flèche gauche" est maintenue
+  if (isKeyLeftPressed) {
+    rotateLeft();
+  }
+  // Si la touche "flèche droite" est maintenue
+  if (isKeyRightPressed) {
+    rotateRight();
+  }
+  
+  // Si la touche "flèche haut" est maintenue
+  if (isKeyUpPressed) {
+    moveForward();
+  }
+
+  // Si la touche "flèche bas" est maintenue
+  if (isKeyDownPressed) {
+    moveBackward();
   }
   
   updateMummy();
@@ -710,6 +729,10 @@ void renderPyramide() {
   // Rendu des niveaux de la pyramide
   for (int niveau = 0; niveau < NIVEAUX; niveau++) {
     renderNiveauPyramide(niveau);
+    //shape(NiveauTMP); NiveauTMP est un shape stocké en param global permet d'update l'affichage sans recalculer tout les vertex
+    // NIVEAU est une variable global contenant le niveau ou le jouer se trouve (a update dans monter et descendre)
+    // On crée a l'avance tout les niveau dans setup, et on l'ajoute dans  un arrayList, comme ca quand on render (dans renderPyramide) on render juste le PShape(arrayList(notre liste de PSHape niveau)[NIVEAU]) 
+    // evite aussi de render l'entiereté de la pyramide a chaque fois SUPER ECONOMIE DE PERFORMANCE et on aura des pts bonus pour ca et en on sera certifié sigma aussi
   }
   
   // Rendu du sommet lisse de la pyramide
@@ -853,46 +876,7 @@ void renderNiveauPyramide(int niveau) {
       popMatrix();
     }
   }
-  /*
-  // On dessine les bords en escalier pour l'extérieur de la pyramide
-  if (niveau > 0) {
-    int niveauPrecedent = niveau - 1;
-    int labSizePrecedent = LAB_SIZES[niveauPrecedent];
-    int decalagePrecedent = DECALAGES[niveauPrecedent];
-    float hauteurPrecedente = HAUTEURS_NIVEAUX[niveauPrecedent];
-    // Dessin des bords en escalier
-    for (int j = 0; j < labSizePrecedent; j++) {
-      for (int i = 0; i < labSizePrecedent; i++) {
-        // Ne dessiner que les bords (cellules qui sont à l'extérieur du niveau actuel)
-        if (i < decalage - decalagePrecedent || 
-            i >= labSize + decalage - decalagePrecedent ||
-            j < decalage - decalagePrecedent || 
-            j >= labSize + decalage - decalagePrecedent) {
-          
-          if (labyrinthes[niveauPrecedent][j][i] == '#') {
-            pushMatrix();
-            translate((i+decalagePrecedent)*20, (j+decalagePrecedent)*20, hauteurPrecedente);
-            
-            // On utilise la texture jaune pour les bords
-            texture(textureStoneJaune);
-            
-            // Dessiner le dessus du bloc (visible depuis l'extérieur)
-            beginShape(QUADS);
-            fill(224, 205, 169); // Permet d'éviter d'avoir un ton bleuâtre sur la moitié de la pyramide (lié au sol peut être)
-            texture(textureStoneJaune);
-            vertex(0, 0, 20, 0, 0);
-            vertex(20, 0, 20, 1, 0);
-            vertex(20, 20, 20, 1, 1);
-            vertex(0, 20, 20, 0, 1);
-            endShape();
-            
-            popMatrix();
-          }
-        }
-      }
-    }
-  }
-  */
+
 }
 
 void renderPyramideLisseExterieure() {
@@ -1093,6 +1077,139 @@ float easeInOutQuad(float t) {
   return t < 0.5 ? 2 * t * t : 1 - pow(-2 * t + 2, 2) / 2;
 }
 
+// Variables pour savoir si une touche est maintenue
+boolean isKeyUpPressed = false;
+boolean isKeyDownPressed = false;
+boolean isKeyLeftPressed = false;
+boolean isKeyRightPressed = false;
+
+// Cette fonction est appelée lorsqu'une touche est relâchée
+void keyReleased() {
+  // Touche flèche haut
+  if (keyCode == 38) {
+    isKeyUpPressed = false;
+  }
+  // Touche flèche bas
+  else if (keyCode == 40) {
+    isKeyDownPressed = false;
+  }
+  // Touche flèche gauche
+  else if (keyCode == 37) {
+    isKeyLeftPressed = false;
+  }
+  // Touche flèche droite
+  else if (keyCode == 39) {
+    isKeyRightPressed = false;
+  }
+}
+
+// Rotation à gauche
+void rotateLeft() {
+  oldDirX = dirX;
+  oldDirY = dirY;
+  
+  float angle = -PI / 48;
+  float tempDirX = dirX;
+  dirX = dirX * cos(angle) - dirY * sin(angle);
+  dirY = tempDirX * sin(angle) + dirY * cos(angle);
+  
+  float longueur = sqrt(dirX * dirX + dirY * dirY);
+  dirX /= longueur;
+  dirY /= longueur;
+  
+  animMode = 2;
+  anim = 2;
+}
+
+// Rotation à droite
+void rotateRight() {
+  oldDirX = dirX;
+  oldDirY = dirY;
+  
+  float angle = PI / 48;
+  float tempDirX = dirX;
+  dirX = dirX * cos(angle) - dirY * sin(angle);
+  dirY = tempDirX * sin(angle) + dirY * cos(angle);
+  
+  float longueur = sqrt(dirX * dirX + dirY * dirY);
+  dirX /= longueur;
+  dirY /= longueur;
+  
+  animMode = 2;
+  anim = 2;
+}
+
+void moveForward() {
+  if (anim > 0) return;
+  float newPosX = posX + dirX * 0.25;
+  float newPosY = posY + dirY * 0.25;
+  deplacerJoueur(newPosX, newPosY);
+}
+
+void moveBackward() {
+  if (anim > 0) return;
+  float newPosX = posX - dirX * 0.25;
+  float newPosY = posY - dirY * 0.25;
+  deplacerJoueur(newPosX, newPosY);
+}
+
+void deplacerJoueur(float newPosX, float newPosY) {
+  oldPosX = posX;
+  oldPosY = posY;
+  oldPosZ = posZ;
+  float newPosZ = posZ;
+  animMode = 1;
+  anim = 4;
+
+  if (estExterieur) {
+    posX = newPosX;
+    posY = newPosY;
+    posZ = newPosZ;
+  } else {
+    int cellX = int(newPosX - DECALAGES[niveauActuel]);
+    int cellY = int(newPosY - DECALAGES[niveauActuel]);
+
+    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] &&
+        cellY >= 0 && cellY < LAB_SIZES[niveauActuel]) {
+      if (labyrinthes[niveauActuel][cellY][cellX] != '#') {
+        boolean canMove = true;
+        float margin = 0.2;
+
+        if (newPosX - (cellX + DECALAGES[niveauActuel]) < margin &&
+            cellX > 0 && labyrinthes[niveauActuel][cellY][cellX - 1] == '#')
+          canMove = false;
+
+        if ((cellX + 1 + DECALAGES[niveauActuel]) - newPosX < margin &&
+            cellX < LAB_SIZES[niveauActuel] - 1 && labyrinthes[niveauActuel][cellY][cellX + 1] == '#')
+          canMove = false;
+
+        if (newPosY - (cellY + DECALAGES[niveauActuel]) < margin &&
+            cellY > 0 && labyrinthes[niveauActuel][cellY - 1][cellX] == '#')
+          canMove = false;
+
+        if ((cellY + 1 + DECALAGES[niveauActuel]) - newPosY < margin &&
+            cellY < LAB_SIZES[niveauActuel] - 1 && labyrinthes[niveauActuel][cellY + 1][cellX] == '#')
+          canMove = false;
+
+        if (canMove) {
+          posX = newPosX;
+          posY = newPosY;
+          posZ = newPosZ;
+        } else {
+          anim = 0;
+        }
+      } else {
+        anim = 0;
+      }
+    } else {
+      posX = newPosX;
+      posY = newPosY;
+      posZ = newPosZ;
+    }
+  }
+}
+
+
 void keyPressed() {
   if (anim > 0) return;
   
@@ -1100,62 +1217,47 @@ void keyPressed() {
   float newPosY = posY;
   float newPosZ = posZ;
   
+  // Touche flèche haut
+  if (keyCode == 38) {
+    isKeyUpPressed = true;
+  }
+  // Touche flèche bas
+  else if (keyCode == 40) {
+    isKeyDownPressed = true;
+  }
+  // Touche flèche gauche
+  else if (keyCode == 37) {
+    isKeyLeftPressed = true;
+  }
+  // Touche flèche droite
+  else if (keyCode == 39) {
+    isKeyRightPressed = true;
+  }
+  
   // Déplacement vers l'avant (flèche haut)
   if (keyCode == 38) {
     oldPosX = posX;
     oldPosY = posY;
     oldPosZ = posZ;
-    newPosX += dirX * 1;
-    newPosY += dirY * 1;
+    newPosX += dirX * 0.25;
+    newPosY += dirY * 0.25;
     animMode = 1;
-    anim = 20;
+    anim = 4;
   }
   // Déplacement vers l'arrière (flèche bas)
   else if (keyCode == 40) {
     oldPosX = posX;
     oldPosY = posY;
     oldPosZ = posZ;
-    newPosX -= dirX * 1;
-    newPosY -= dirY * 1;
+    newPosX -= dirX * 0.25;
+    newPosY -= dirY * 0.25;
     animMode = 1;
-    anim = 20;
+    anim = 4;
   }
-  // Rotation à gauche (flèche gauche) - keyCode 37
-  else if (keyCode == 37) {
-    oldDirX = dirX;
-    oldDirY = dirY;
-    
-    float angle = -PI/8;
-    float tempDirX = dirX;
-    dirX = dirX * cos(angle) - dirY * sin(angle);
-    dirY = tempDirX * sin(angle) + dirY * cos(angle);
-    
-    // On normalise le vecteur direction pour éviter les dérives potentielles
-    float longueur = sqrt(dirX*dirX + dirY*dirY);
-    dirX /= longueur;
-    dirY /= longueur;
-    
-    animMode = 2;
-    anim = 10;
-  }
-  // Rotation à droite (flèche droite) - keyCode 39
-  else if (keyCode == 39) {
-    // Sauvegarder l'ancienne direction
-    oldDirX = dirX;
-    oldDirY = dirY;
-    
-    float angle = PI/8;
-    float tempDirX = dirX;
-    dirX = dirX * cos(angle) - dirY * sin(angle);
-    dirY = tempDirX * sin(angle) + dirY * cos(angle);
-    
-    float longueur = sqrt(dirX*dirX + dirY*dirY);
-    dirX /= longueur;
-    dirY /= longueur;
-    
-    animMode = 2;
-    anim = 10;
-  }
+  // Rotation à gauche (flèche gauche) - keyCode 37 [je lai deplacer dans une fonction] rotateLeft()
+
+  // Rotation à droite (flèche droite) - keyCode 39 [je lai deplacer dans une fonction] rotateRight()
+
   // Monter (touche 'e')
   else if (key == 'e' || key == 'E') {
     // Vérifier si le joueur est sur un escalier montant
@@ -1188,60 +1290,6 @@ void keyPressed() {
     }
   }
   
-  // Vérification de collision avec les murs avant de déplacer le joueur
-  if (estExterieur) {
-    // Si le joueur est à l'extérieur, pas de collision avec les murs
-    posX = newPosX;
-    posY = newPosY;
-    posZ = newPosZ;
-  } else {
-    // Si le joueur est à l'intérieur, vérifier les collisions
-    int cellX = int(newPosX - DECALAGES[niveauActuel]);
-    int cellY = int(newPosY - DECALAGES[niveauActuel]);
-    
-    // Vérifier si la nouvelle position est valide (dans les limites et pas un mur)
-    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] && 
-        cellY >= 0 && cellY < LAB_SIZES[niveauActuel]) {
-      if (labyrinthes[niveauActuel][cellY][cellX] != '#') {
-        boolean canMove = true;
-        
-        // Vérification plus précise pour éviter de traverser les murs
-        float margin = 0.2; // Marge pour éviter de traverser les murs
-        
-        // Vérifier les cellules adjacentes
-        if (newPosX - (cellX + DECALAGES[niveauActuel]) < margin && 
-            cellX > 0 && labyrinthes[niveauActuel][cellY][cellX-1] == '#') 
-          canMove = false;
-        
-        if ((cellX + 1 + DECALAGES[niveauActuel]) - newPosX < margin && 
-            cellX < LAB_SIZES[niveauActuel]-1 && labyrinthes[niveauActuel][cellY][cellX+1] == '#') 
-          canMove = false;
-        
-        if (newPosY - (cellY + DECALAGES[niveauActuel]) < margin && 
-            cellY > 0 && labyrinthes[niveauActuel][cellY-1][cellX] == '#') 
-          canMove = false;
-        
-        if ((cellY + 1 + DECALAGES[niveauActuel]) - newPosY < margin && 
-            cellY < LAB_SIZES[niveauActuel]-1 && labyrinthes[niveauActuel][cellY+1][cellX] == '#') 
-          canMove = false;
-        
-        if (canMove) {
-          posX = newPosX;
-          posY = newPosY;
-          posZ = newPosZ;
-        } else {
-          anim = 0;
-        }
-      } else {
-        anim = 0;
-      }
-    } else {
-      // Le joueur sort du labyrinthe, il est maintenant à l'extérieur
-      posX = newPosX;
-      posY = newPosY;
-      posZ = newPosZ;
-    }
-  }
 }
 
 //=====================FONCTION  MOMIE===================================

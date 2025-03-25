@@ -64,7 +64,7 @@ float time = 0;
 void setup() { 
   frameRate(20);
   randomSeed(2);
-  size(1920, 1080, P3D);
+  size(1000, 1000, P3D);
   
   // Chargement des textures
   textureStone = loadImage("stone.jpg");

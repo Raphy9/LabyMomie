@@ -889,6 +889,7 @@ void renderPyramideLisseExterieure() {
   noStroke();
 
 textureWrap(REPEAT);
+  float t = -apexZ / (20 - apexZ);
   // Face 1 (devant)
   beginShape(TRIANGLES);
     texture(textureStoneJaune);
@@ -898,24 +899,64 @@ textureWrap(REPEAT);
     vertex(baseSize/2, baseSize/2, apexZ,10,  20);
   endShape();
   
-  // Face 1 (devant)
+  // Face 1 (devant toit)
   beginShape(TRIANGLES);
     fill(255);
-    // On mappe la texture comme on veut (u,v). Ici, simple.
     vertex((baseSize/2) * ((apexZ - 60) / (apexZ - 20)),         (baseSize/2) * ((apexZ - 60) / (apexZ - 20)),        apexZ-40, 0,  0);
     vertex(baseSize - (baseSize/2) * ((apexZ - 60) / (apexZ - 20)),  (baseSize/2) * ((apexZ - 60) / (apexZ - 20)),        apexZ-40, 20,  0);
     vertex(baseSize/2, baseSize/2, apexZ+1,10,  20);
   endShape();
+  
+  
+  //truc pour l'entrée etc..
+  // Entrée droite (quad)
+  beginShape(QUADS);
+    texture(textureStoneJaune);
+    vertex(baseSize, 0, 20, 0, 0);             // haut gauche
+    vertex(40, 0, 20, 18, 0);                   // haut droite
+    vertex(40, -15, 0, 18, 1.2);                 // bas droite
+    vertex(baseSize+15, -15, 0, 0, 1.2);        // bas gauche
+  endShape();
+  
+  // Côté droit (triangle)
+  beginShape(TRIANGLES);
+    texture(textureStoneJaune);
+    vertex(40, 0, 20, 0, 0);                    // sommet haut
+    vertex(40, -15, 0, 0, 1);                 // bas gauche
+    vertex(40, 0, 0, 0.8, 1);                    // bas droite
+  endShape();
+  
+  // Entrée gauche (quad)
+  beginShape(QUADS);
+    texture(textureStoneJaune);
+    vertex(20, 0, 20, 0, 0);                   // haut gauche
+    vertex(0, 0, 20, 1.2, 0);                     // haut droite
+    vertex(-15, -15, 0, 1.2, 1.2);                 // bas droite
+    vertex(20, -15, 0,0, 1.2);                 // bas gauche
+  endShape();
+  
+  // Côté gauche (triangle)
+  beginShape(TRIANGLES);
+    texture(textureStoneJaune);
+    vertex(20, 0, 20, 0, 0);                    // sommet haut
+    vertex(20, 0, 0, 0.8, 1);                    // bas droite
+    vertex(20, -15, 0, 0, 1);                 // bas gauche
+  endShape();
+
+
 
   // Face 2 (droite)
   beginShape(TRIANGLES);
     texture(textureStoneJaune);
-    vertex(baseSize, 0,     20,     0,   0);
-    vertex(baseSize, baseSize, 20, 20,   0);
-    vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
+    //vertex(baseSize, 0,     20,     0,   0);
+    //vertex(baseSize, baseSize, 20, 20,   0);
+    
+    vertex(baseSize/2 * (1+t), baseSize/2 * (1+t), 0, 0, 0);
+    vertex(baseSize/2 * (1-t), baseSize/2 * (1+t), 0, 20, 0);
+    vertex(baseSize/2, baseSize/2, apexZ, 10, 20); 
   endShape();
   
-  // Face 2 (droite)
+  // Face 2 (droite toit)
   beginShape(TRIANGLES);
     fill(255);
     vertex(baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),  (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),        apexZ-40, 0, 0);
@@ -926,12 +967,12 @@ textureWrap(REPEAT);
   // Face 3 (arrière)
   beginShape(TRIANGLES);
     texture(textureStoneJaune);
-    vertex(baseSize, baseSize, 20, 0,   0);
-    vertex(0,        baseSize, 20, 20,   0);
+    vertex(baseSize/2 * (1+t), baseSize/2 * (1-t), 0, 0,   0);
+    vertex(baseSize/2 * (1+t),        baseSize/2 * (1+t), 0, 20,   0);
     vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
   endShape();
   
-  // Face 3 (arrière)
+  // Face 3 (arrière toit)
   beginShape(TRIANGLES);
     fill(255);
     vertex(baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),  baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)), apexZ-40, 0, 0);
@@ -939,15 +980,18 @@ textureWrap(REPEAT);
     vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
 
-   // Face 4 (gauche)
+
+  // Face 4 (gauche)
   beginShape(TRIANGLES);
     texture(textureStoneJaune);
-    vertex(0, baseSize, 20,     0,   0);
-    vertex(0, 0,        20,     20,   0);
+    vertex(baseSize/2 * (1-t), baseSize/2 * (1+t), 0, 0, 0);  
+    vertex(baseSize/2 * (1-t), baseSize/2 * (1-t), 0, 20, 0);  
     vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
   endShape();
+
+
   
-  // Face 4 (gauche)
+ // Face 4 (gauche toit)
   beginShape(TRIANGLES);
     fill(255);
     vertex((baseSize/2) * ((apexZ - 60)/(apexZ - 20)),         baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)), apexZ-40, 0, 0);

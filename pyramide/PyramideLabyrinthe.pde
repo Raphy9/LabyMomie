@@ -34,6 +34,10 @@ final float[] HAUTEURS_NIVEAUX = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180};
 final float HAUTEUR_SOMMET = 200;
 final int[] DECALAGES = {0,1,2,3,4,5,6,7,8,9};
 
+ArrayList<PShape> niveauxShapes = new ArrayList<PShape>();
+int NIVEAUACTUEL =0;
+
+
 
 char[][][] labyrinthes;
 char[][][][] sides;
@@ -66,6 +70,8 @@ void setup() {
   randomSeed(2);
   size(1000, 1000, P3D);
   
+  
+  
   // Chargement des textures
   textureStone = loadImage("stone.jpg");
   if (textureStone == null) {
@@ -90,6 +96,12 @@ void setup() {
     sides[niveau] = new char[LAB_SIZES[niveau]][LAB_SIZES[niveau]][4];
     genererLabyrinthe(niveau);
   }
+  
+  // Chargement des niveaux
+  for (int niveau = 0; niveau < NIVEAUX; niveau++) {
+    niveauxShapes.add(genererShapeNiveau(niveau));
+  }
+
   
   // Initialisation des variables de position et direction (jai repris ça de mon labyrinthe de base)
   posX = 1.4;
@@ -722,14 +734,16 @@ void renderSolDesertique(boolean light) {
 // Pour la pyramide complète
 void renderPyramide() {
   // Rendu des niveaux de la pyramide
-  for (int niveau = 0; niveau < NIVEAUX; niveau++) {
-    renderNiveauPyramide(niveau);
+  //for (int niveau = 0; niveau < NIVEAUX; niveau++) {
+    //renderNiveauPyramide(niveau);
+    
     //shape(NiveauTMP); NiveauTMP est un shape stocké en param global permet d'update l'affichage sans recalculer tout les vertex
     // NIVEAU est une variable global contenant le niveau ou le jouer se trouve (a update dans monter et descendre)
     // On crée a l'avance tout les niveau dans setup, et on l'ajoute dans  un arrayList, comme ca quand on render (dans renderPyramide) on render juste le PShape(arrayList(notre liste de PSHape niveau)[NIVEAU]) 
     // evite aussi de render l'entiereté de la pyramide a chaque fois SUPER ECONOMIE DE PERFORMANCE et on aura des pts bonus pour ca et en on sera certifié sigma aussi
-  }
-  
+  //}
+  // Rendu du niveau actuel
+  shape(niveauxShapes.get(NIVEAUACTUEL));
   // Rendu du sommet lisse de la pyramide
   renderPyramideLisseExterieure();
 }
@@ -874,12 +888,183 @@ void renderNiveauPyramide(int niveau) {
 
 }
 
+PShape genererShapeNiveau(int niveau) {
+  // Création d'un groupe global pour le niveau
+  PShape niveauShape = createShape(GROUP);
+  int labSize = LAB_SIZES[niveau];
+  float hauteurNiveau = HAUTEURS_NIVEAUX[niveau];
+  int decalage = DECALAGES[niveau];
+  
+  // Parcours de toutes les cases du labyrinthe du niveau
+  for (int j = 0; j < labSize; j++) {
+    for (int i = 0; i < labSize; i++) {
+      // Créer un PShape groupe pour la cellule courante
+      PShape cellShape = createShape(GROUP);
+      // Calcul de la translation de la cellule dans l'espace 3D
+      float transX = (i + decalage) * 20;
+      float transY = (j + decalage) * 20;
+      float transZ = hauteurNiveau;
+      
+      // Selon le caractère de la cellule, on recrée les dessins déjà faits dans renderNiveauPyramide
+      if (labyrinthes[niveau][j][i] == '#') {
+        boolean estExterieur = (i == 0 || i == labSize - 1 || j == 0 || j == labSize - 1);
+        
+        // Mur Nord (face avant)
+        if (j == 0 || labyrinthes[niveau][j-1][i] != '#') {
+          PShape murNord = createShape();
+          murNord.beginShape(QUADS);
+          if (estExterieur || (j == 0 && i == 1)) {
+            murNord.texture(textureStoneJaune);
+          } else {
+            murNord.texture(textureStone);
+          }
+          murNord.vertex(0, 0, 0, 0, 0);
+          murNord.vertex(20, 0, 0, 1, 0);
+          murNord.vertex(20, 0, 20, 1, 1);
+          murNord.vertex(0, 0, 20, 0, 1);
+          murNord.endShape();
+          murNord.translate(transX, transY, transZ);
+          cellShape.addChild(murNord);
+        }
+        
+        // Mur Sud (face arrière)
+        if (j == labSize - 1 || labyrinthes[niveau][j+1][i] != '#') {
+          PShape murSud = createShape();
+          murSud.beginShape(QUADS);
+          if (estExterieur) {
+            murSud.texture(textureStoneJaune);
+          } else {
+            murSud.texture(textureStone);
+          }
+          murSud.vertex(0, 20, 0, 0, 0);
+          murSud.vertex(20, 20, 0, 1, 0);
+          murSud.vertex(20, 20, 20, 1, 1);
+          murSud.vertex(0, 20, 20, 0, 1);
+          murSud.endShape();
+          murSud.translate(transX, transY, transZ);
+          cellShape.addChild(murSud);
+        }
+        
+        // Mur Est (face droite)
+        if (i == labSize - 1 || labyrinthes[niveau][j][i+1] != '#') {
+          PShape murEst = createShape();
+          murEst.beginShape(QUADS);
+          if (estExterieur) {
+            murEst.texture(textureStoneJaune);
+          } else {
+            murEst.texture(textureStone);
+          }
+          murEst.vertex(20, 0, 0, 0, 0);
+          murEst.vertex(20, 20, 0, 1, 0);
+          murEst.vertex(20, 20, 20, 1, 1);
+          murEst.vertex(20, 0, 20, 0, 1);
+          murEst.endShape();
+          murEst.translate(transX, transY, transZ);
+          cellShape.addChild(murEst);
+        }
+        
+        // Mur Ouest (face gauche)
+        if (i == 0 || labyrinthes[niveau][j][i-1] != '#') {
+          PShape murOuest = createShape();
+          murOuest.beginShape(QUADS);
+          if (estExterieur) {
+            murOuest.texture(textureStoneJaune);
+          } else {
+            murOuest.texture(textureStone);
+          }
+          murOuest.vertex(0, 0, 0, 0, 0);
+          murOuest.vertex(0, 20, 0, 1, 0);
+          murOuest.vertex(0, 20, 20, 1, 1);
+          murOuest.vertex(0, 0, 20, 0, 1);
+          murOuest.endShape();
+          murOuest.translate(transX, transY, transZ);
+          cellShape.addChild(murOuest);
+        }
+        
+        // Plafond (face supérieure)
+        PShape plafond = createShape();
+        plafond.beginShape(QUADS);
+        plafond.texture(textureStone);
+        plafond.vertex(0, 0, 20, 0, 0);
+        plafond.vertex(20, 0, 20, 1, 0);
+        plafond.vertex(20, 20, 20, 1, 1);
+        plafond.vertex(0, 20, 20, 0, 1);
+        plafond.endShape();
+        plafond.translate(transX, transY, transZ);
+        cellShape.addChild(plafond);
+        
+        // Sol (face inférieure)
+        PShape sol = createShape();
+        sol.beginShape(QUADS);
+        sol.texture(textureStone);
+        sol.vertex(0, 0, 0, 0, 0);
+        sol.vertex(20, 0, 0, 1, 0);
+        sol.vertex(20, 20, 0, 1, 1);
+        sol.vertex(0, 20, 0, 0, 1);
+        sol.endShape();
+        sol.translate(transX, transY, transZ);
+        cellShape.addChild(sol);
+      }
+      else if (labyrinthes[niveau][j][i] == ' ') {
+        // Sol pour les cases vides - GRIS
+        PShape solVide = createShape();
+        solVide.beginShape(QUADS);
+        solVide.noStroke();
+        solVide.fill(50, 50, 50);
+        solVide.vertex(0, 0, 0, 0, 0);
+        solVide.vertex(20, 0, 0, 1, 0);
+        solVide.vertex(20, 20, 0, 1, 1);
+        solVide.vertex(0, 20, 0, 0, 1);
+        solVide.endShape();
+        solVide.translate(transX, transY, transZ);
+        cellShape.addChild(solVide);
+        
+        // Plafond pour les cases vides - GRIS
+        PShape plafondVide = createShape();
+        plafondVide.beginShape(QUADS);
+        plafondVide.noStroke();
+        plafondVide.fill(50, 50, 50);
+        plafondVide.vertex(0, 0, 20, 0, 0);
+        plafondVide.vertex(20, 0, 20, 1, 0);
+        plafondVide.vertex(20, 20, 20, 1, 1);
+        plafondVide.vertex(0, 20, 20, 0, 1);
+        plafondVide.endShape();
+        plafondVide.translate(transX, transY, transZ);
+        cellShape.addChild(plafondVide);
+      }
+      else if (labyrinthes[niveau][j][i] == 'E' || labyrinthes[niveau][j][i] == 'D') {
+        // Marqueur pour l'emplacement des escaliers
+        PShape escalier = createShape();
+        escalier.beginShape(QUADS);
+        escalier.noStroke();
+        if (labyrinthes[niveau][j][i] == 'E') {
+          escalier.fill(0, 0, 255); // Bleu pour monter
+        } else {
+          escalier.fill(255, 0, 0); // Rouge pour descendre
+        }
+        escalier.vertex(0, 0, 0, 0, 0);
+        escalier.vertex(20, 0, 0, 1, 0);
+        escalier.vertex(20, 20, 0, 1, 1);
+        escalier.vertex(0, 20, 0, 0, 1);
+        escalier.endShape();
+        escalier.translate(transX, transY, transZ);
+        cellShape.addChild(escalier);
+      }
+      
+      // Ajouter la cellule au niveau
+      niveauShape.addChild(cellShape);
+    }
+  }
+  return niveauShape;
+}
+
+
 void renderPyramideLisseExterieure() {
   // Taille de base : la pyramide la plus large fait 21 cases × 20 unités = 420
   float baseSize = 21 * 20;
   // On place le sommet à 200 en Z (comme HAUTEUR_SOMMET)
   float apexZ = 300;
-
+                                      
   pushMatrix();
   noStroke();
 
@@ -940,7 +1125,7 @@ textureWrap(REPEAT);
 
 
 
-  // Face 2 (droite)
+  // Face 2 (arrière)
   beginShape(TRIANGLES);
     texture(textureStoneJaune);
     //vertex(baseSize, 0,     20,     0,   0);
@@ -951,7 +1136,7 @@ textureWrap(REPEAT);
     vertex(baseSize/2, baseSize/2, apexZ, 10, 20); 
   endShape();
   
-  // Face 2 (droite toit)
+  // Face 2 (arrière toit)
   beginShape(TRIANGLES);
     fill(255);
     vertex(baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),  (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),        apexZ-40, 0, 0);
@@ -959,15 +1144,50 @@ textureWrap(REPEAT);
     vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
 
-  // Face 3 (arrière)
+  // Face 3 (droite)
   beginShape(TRIANGLES);
     texture(textureStoneJaune);
-    vertex(baseSize/2 * (1+t), baseSize/2 * (1-t), 0, 0,   0);
-    vertex(baseSize/2 * (1+t),        baseSize/2 * (1+t), 0, 20,   0);
+    vertex(baseSize, 0,     20,     0,   0);
+    vertex(baseSize, baseSize, 20, 20,   0);
     vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
   endShape();
   
-  // Face 3 (arrière toit)
+  //truc pour l'entrée etc..
+  // Entrée droite (quad)
+  beginShape(QUADS);
+    texture(textureStoneJaune);
+    vertex(baseSize, baseSize     , 20, 0, 0);             // haut gauche
+    vertex(baseSize, baseSize-20, 20, 1.2, 0);                   // haut droite
+    vertex(baseSize+15, baseSize-20, 0, 1.2, 1.2);                 // bas droite
+    vertex(baseSize+15, baseSize+15, 0, 0, 1.2);        // bas gauche
+  endShape();
+  
+  // Côté droit (triangle)
+  beginShape(TRIANGLES);
+    texture(textureStoneJaune);
+    vertex(baseSize, baseSize-20,   20, 0, 0);                    // sommet haut
+    vertex(baseSize+15, baseSize-20, 0, 0, 1);                  // bas gauche
+    vertex(baseSize, baseSize-20,    0, 1, 1);                    // bas droite
+  endShape();
+  
+  // Entrée gauche (quad)
+  beginShape(QUADS);
+    texture(textureStoneJaune);
+    vertex(baseSize, baseSize-40, 20, 18, 0);                   // haut gauche
+    vertex(baseSize, 0, 20, 0, 0);               // haut droite
+    vertex(baseSize+15, -15, 0, 0, 1.2);        // bas droite
+    vertex(baseSize+15, baseSize-40, 0, 18, 1.2);                 // bas gauche
+  endShape();
+  
+  // Côté gauche (triangle)
+  beginShape(TRIANGLES);
+    texture(textureStoneJaune);
+    vertex(baseSize, baseSize-40, 20, 0, 0);                    // sommet haut
+    vertex(baseSize+15, baseSize-40, 0, 0, 1);                   // bas droite
+    vertex(baseSize, baseSize-40, 0, 1, 1);                    // bas gauche
+  endShape();
+  
+  // Face 3 (droite toit)
   beginShape(TRIANGLES);
     fill(255);
     vertex(baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)),  baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)), apexZ-40, 0, 0);
@@ -1198,7 +1418,7 @@ void deplacerJoueur(float newPosX, float newPosY) {
   oldPosZ = posZ;
   float newPosZ = posZ;
   animMode = 1;
-  anim = 4;
+  anim = 3;
 
   if (estExterieur) {
     posX = newPosX;
@@ -1282,6 +1502,7 @@ void keyPressed() {
       
       // Monter d'un niveau avec animation
       animerMonteeDescente(niveauActuel + 1, 1 + DECALAGES[niveauActuel + 1], 1 + DECALAGES[niveauActuel + 1]);
+      NIVEAUACTUEL++;
     }
   }
   // Descendre (touche 'd')
@@ -1298,6 +1519,7 @@ void keyPressed() {
       // Descendre d'un niveau avec animation
       animerMonteeDescente(niveauActuel - 1, (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1], 
                           (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1]);
+                          NIVEAUACTUEL--;
     }
   }
   

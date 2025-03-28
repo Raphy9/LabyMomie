@@ -68,49 +68,88 @@ PImage createTextureSable() {
 void renderCiel() {
   pushMatrix();
   
-  // On désactive la profondeur pour dessiner le ciel en arrière-plan
+  // Désactiver la profondeur pour dessiner en arrière-plan
   hint(DISABLE_DEPTH_TEST);
   
-  // On dessine un cube très grand autour de la scène
+     noLights();
+     noTint();
+  
+  // Définir la taille de la sphère du ciel
   float skySize = 2000;
+  
+  textureWrap(REPEAT);
+  
+  // Créer la sphère avec createShape
+  PShape skySphere = createShape(SPHERE, skySize);
+  
+  // Appliquer la texture
+  skySphere.setTexture(textureCiel);
+  
+  // Désactiver les contours
+  skySphere.setStroke(false);
+  
+  // Afficher la sphère
+  shape(skySphere);
+  
+  hint(ENABLE_DEPTH_TEST);
+  popMatrix();
+}
+
+void renderCielAlternatif() {
+  pushMatrix();
+  
+  // Désactiver la profondeur pour dessiner en arrière-plan
+  hint(DISABLE_DEPTH_TEST);
+  
+  // Désactiver l'éclairage
+  noLights();
+  
+  // S'assurer qu'aucune teinte n'est appliquée
+  noTint();
+  
+  float skySize = 2000;
+  int detail = 24; // Niveau de détail de la sphère
+  
+  // Utiliser le mode de texture NORMAL
+  textureMode(NORMAL);
+  
+  // Désactiver les contours
   noStroke();
   
-  // Dessiner le ciel avec la texture
-  beginShape(QUADS);
+  // Dessiner la sphère manuellement avec des triangles
+  beginShape(TRIANGLES);
   texture(textureCiel);
   
-  // Face avant
-  vertex(-skySize, -skySize, -skySize, 0, 0);
-  vertex(skySize, -skySize, -skySize, 1, 0);
-  vertex(skySize, -skySize, skySize, 1, 1);
-  vertex(-skySize, -skySize, skySize, 0, 1);
-  
-  // Face arrière
-  vertex(-skySize, skySize, -skySize, 0, 0);
-  vertex(skySize, skySize, -skySize, 1, 0);
-  vertex(skySize, skySize, skySize, 1, 1);
-  vertex(-skySize, skySize, skySize, 0, 1);
-  
-  // Face gauche
-  vertex(-skySize, -skySize, -skySize, 0, 0);
-  vertex(-skySize, skySize, -skySize, 1, 0);
-  vertex(-skySize, skySize, skySize, 1, 1);
-  vertex(-skySize, -skySize, skySize, 0, 1);
-  
-  // Face droite
-  vertex(skySize, -skySize, -skySize, 0, 0);
-  vertex(skySize, skySize, -skySize, 1, 0);
-  vertex(skySize, skySize, skySize, 1, 1);
-  vertex(skySize, -skySize, skySize, 0, 1);
-  
-  // Face supérieure (ciel)
-  vertex(-skySize, -skySize, skySize, 0, 0);
-  vertex(skySize, -skySize, skySize, 1, 0);
-  vertex(skySize, skySize, skySize, 1, 1);
-  vertex(-skySize, skySize, skySize, 0, 1);
+  // Générer les sommets de la sphère avec les coordonnées UV appropriées
+  for (int i = 0; i < detail; i++) {
+    float lat1 = map(i, 0, detail, 0, PI);
+    float lat2 = map(i + 1, 0, detail, 0, PI);
+    
+    for (int j = 0; j < detail; j++) {
+      float lon1 = map(j, 0, detail, 0, TWO_PI);
+      float lon2 = map(j + 1, 0, detail, 0, TWO_PI);
+      
+      // Coordonnées UV
+      float u1 = map(lon1, 0, TWO_PI, 0, 1);
+      float u2 = map(lon2, 0, TWO_PI, 0, 1);
+      float v1 = map(lat1, 0, PI, 0, 1);
+      float v2 = map(lat2, 0, PI, 0, 1);
+      
+      // Premier triangle
+      vertex(skySize * sin(lat1) * cos(lon1), skySize * sin(lat1) * sin(lon1), skySize * cos(lat1), u1, v1);
+      vertex(skySize * sin(lat2) * cos(lon1), skySize * sin(lat2) * sin(lon1), skySize * cos(lat2), u1, v2);
+      vertex(skySize * sin(lat2) * cos(lon2), skySize * sin(lat2) * sin(lon2), skySize * cos(lat2), u2, v2);
+      
+      // Deuxième triangle
+      vertex(skySize * sin(lat1) * cos(lon1), skySize * sin(lat1) * sin(lon1), skySize * cos(lat1), u1, v1);
+      vertex(skySize * sin(lat2) * cos(lon2), skySize * sin(lat2) * sin(lon2), skySize * cos(lat2), u2, v2);
+      vertex(skySize * sin(lat1) * cos(lon2), skySize * sin(lat1) * sin(lon2), skySize * cos(lat1), u2, v1);
+    }
+  }
   
   endShape();
   
+  // Réactiver la profondeur
   hint(ENABLE_DEPTH_TEST);
   
   popMatrix();

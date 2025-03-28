@@ -1,8 +1,6 @@
 ArrayList<PShape> niveauxShapes = new ArrayList<PShape>();
 int NIVEAUACTUEL =0;
 
-
-
 char[][][] labyrinthes;
 char[][][][] sides;
 float posX, posY, posZ, dirX, dirY;
@@ -35,11 +33,15 @@ void setup() {
   
   textureStoneJaune = createTextureJaune(textureStone);
   textureSable = createTextureSable();
-  textureCiel = createTextureCiel();
+  
+
+  textureCiel = loadImage("360.png");
+
+  
   textureMode(NORMAL);
   
   // Initialisaton Momie
-  mummyGroup = createMummy();  
+  mummyGroup = createMummy();
 
   
   // Initialisation des labyrinthes pour chaque niveau
@@ -75,21 +77,6 @@ void setup() {
 }
 
 void draw() {
-  background(100, 150, 255); // Fond bleu ciel
-  
-  // Mise à jour du temps pour les shaders
-  time += 0.05;
-  
-  if (anim > 0) {
-    anim--;
-  }
-  
-  gestionDeplacements();
-  
-  updateMummy();
-  
-  perspective(PI/3.0, float(width)/float(height), 1, 1000);
-  
   float camX, camY, camZ, lookX, lookY, lookZ;
   
   if (anim > 0) {
@@ -140,21 +127,37 @@ void draw() {
     lookZ = posZ;
   }
   
+  background(100, 0, 255); // Fond bleu ciel
+  
   camera(
     camX, camY, camZ,
-    camX + dirX*20, camY + dirY*20, camZ, // On règle l'axe pour pouvoir conserver regarder perpendiculairement au corps de la momie (et pour les tests c'est mieux...)
+    camX + dirX*20, camY + dirY*20, camZ,
     0, 0, -1
   );
+  
+  // Dessiner le ciel uniquement si on est à l'extérieur
+  if (estExterieur) {
+    renderCielAlternatif();
+  }
+  
+  // Mise à jour du temps pour les shaders
+  time += 0.05;
+  
+  if (anim > 0) {
+    anim--;
+  }
+  
+  gestionDeplacements();
+  
+  updateMummy();
+  
+  perspective(PI/3.0, float(width)/float(height), 1, 1000);
   
   estExterieur = checkSiExterieur();
   
   resetShader();
   noTint();
   
-  // Dessiner le ciel uniquement si on est à l'extérieur
-  if (estExterieur) {
-    renderCiel();
-  }
   
   configLights();
   
@@ -186,8 +189,8 @@ void configLights() {
     directionalLight(200, 200, 200, 0.5, 0.5, -1);
   } else {
     // Éclairage intérieur (sombre mais suffisant pour voir les murs)
-    ambientLight(50, 50, 60);
-    pointLight(200, 200, 250, posX*20, posY*20, posZ + hauteur + 5);
+
+    pointLight(200, 200, 250, posX*2, posY*2, posZ + hauteur + 5);
     lightFalloff(1.0, 0.1, 0.01);
   }
 }

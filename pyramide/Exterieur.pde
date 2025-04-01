@@ -1,6 +1,6 @@
 float[][] hauteursSol;
 // Le terrain  l'extérieur
-int TAILLE_DESERT = 100;
+int TAILLE_DESERT = 150;
 
 PImage createTextureCiel() {
   PImage result = createImage(512, 512, RGB);
@@ -66,36 +66,6 @@ PImage createTextureSable() {
 }
 
 void renderCiel() {
-  pushMatrix();
-  
-  // Désactiver la profondeur pour dessiner en arrière-plan
-  hint(DISABLE_DEPTH_TEST);
-  
-     noLights();
-     noTint();
-  
-  // Définir la taille de la sphère du ciel
-  float skySize = 2000;
-  
-  textureWrap(REPEAT);
-  
-  // Créer la sphère avec createShape
-  PShape skySphere = createShape(SPHERE, skySize);
-  
-  // Appliquer la texture
-  skySphere.setTexture(textureCiel);
-  
-  // Désactiver les contours
-  skySphere.setStroke(false);
-  
-  // Afficher la sphère
-  shape(skySphere);
-  
-  hint(ENABLE_DEPTH_TEST);
-  popMatrix();
-}
-
-void renderCielAlternatif() {
   pushMatrix();
   
   // Désactiver la profondeur pour dessiner en arrière-plan

@@ -20,11 +20,11 @@ PImage createTextureJaune(PImage original) {
   return result;
 }
 
-void renderPyramideLisseExterieure() {
+void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites) {
   // Taille de base : la pyramide la plus large fait 21 cases × 20 unités = 420
-  float baseSize = 21 * 20;
-  // On place le sommet à 200 en Z (comme HAUTEUR_SOMMET)
-  float apexZ = 300;
+  float baseSize = nbCases * nbUnites;
+  // On place le sommet à 300 en Z
+  float apexZ = hauteurSommet;
                                       
   pushMatrix();
   noStroke();

@@ -34,15 +34,12 @@ void setup() {
   textureStoneJaune = createTextureJaune(textureStone);
   textureSable = createTextureSable();
   
-
-  textureCiel = loadImage("360.png");
-
+  textureCiel = loadImage("ciel.png");
   
   textureMode(NORMAL);
   
   // Initialisaton Momie
   mummyGroup = createMummy();
-
   
   // Initialisation des labyrinthes pour chaque niveau
   labyrinthes = new char[NIVEAUX][][];
@@ -137,7 +134,7 @@ void draw() {
   
   // Dessiner le ciel uniquement si on est à l'extérieur
   if (estExterieur) {
-    renderCielAlternatif();
+    renderCiel();
   }
   
   // Mise à jour du temps pour les shaders
@@ -173,26 +170,103 @@ void draw() {
   // Afficher les indications pour les escaliers
   gererEscaliers();
   
+  noLights(); // sinon les lumières vont affecter la minimap.
   drawMiniMap();
 }
 
 // Pour la pyramide complète
 void renderPyramide() {
+  // Pyramide d'origine (existante)
+  pushMatrix();
   shape(niveauxShapes.get(NIVEAUACTUEL));
-  renderPyramideLisseExterieure();
+  renderPyramideLisseExterieure(300, 21, 20);
+  popMatrix();
+
+  // Deuxième pyramide (à gauche)
+  pushMatrix();
+  translate(470, -229, 0);
+  renderPyramideLisseExterieure(220, 18, 17);
+  popMatrix();
 }
 
 void configLights() {
-    // Configuration de l'éclairage selon la position du joueur
+  // Configuration de l'éclairage selon la position du joueur
   if (estExterieur) {
-    // Éclairage extérieur (clair)
-    directionalLight(200, 200, 200, 0.5, 0.5, -1);
+    // Éclairage extérieur (clair mais légèrement réduit)
+    directionalLight(180, 180, 180, 0.5, 0.5, -1);
+    
+    // Ajout d'une lumière ambiante faible pour éviter le noir complet dans les zones d'ombre
+    ambientLight(40, 40, 50);
   } else {
-    // Éclairage intérieur (sombre mais suffisant pour voir les murs)
-
-    pointLight(200, 200, 250, posX*2, posY*2, posZ + hauteur + 5);
-    lightFalloff(1.0, 0.1, 0.01);
+    // Éclairage intérieur (très sombre avec effet de lampe torche)
+    
+    // Paramètres ajustables pour la lampe torche
+    float spotMainIntensity = 170;          // Intensité de la lampe torche principale (0-255)
+    float spotSecondaryIntensity = 110;      // Intensité de la lampe torche secondaire (0-255)
+    float spotMainAngle = PI/2;             // Angle du cône principal (en radians, PI/4 = 45°)
+    float spotSecondaryAngle = PI/2.5;      // Angle du cône secondaire (en radians)
+    float spotMainConcentration = 8;        // Concentration du faisceau principal (1-128)
+    float spotSecondaryConcentration = 2;   // Concentration du faisceau secondaire (1-128)
+    float falloffConstant = 0.0;            // Atténuation constante (0-1)
+    float falloffLinear = 0.048;             // Atténuation linéaire (0-1)
+    float falloffQuadratic = 0.0001;         // Atténuation quadratique (0-1)
+    
+    // Paramètres de falloff pour une atténuation réaliste de la lumière avec la distance
+    lightFalloff(falloffConstant, falloffLinear, falloffQuadratic);
+    
+    // Effet de lampe torche principale - spotlight dans la direction du regard
+    spotLight(
+      spotMainIntensity, spotMainIntensity, spotMainIntensity * 1.13,  // couleur
+      posX*20, posY*20, posZ + hauteur - 2,                           // position légèrement devant la caméra
+      dirX, dirY, -0.2,                                               // direction (légèrement vers le bas)
+      spotMainAngle,                                                  // angle du cône
+      spotMainConcentration                                           // concentration
+    );
+    
+    // Lumière secondaire plus large et plus faible pour éclairer légèrement les environs
+    spotLight(
+      spotSecondaryIntensity, spotSecondaryIntensity, spotSecondaryIntensity * 1.2,  // couleur
+      posX*20, posY*20, posZ + hauteur,                                             // position à la caméra
+      dirX, dirY, -0.2,                                                             // direction (ici légèrement inclinée vers le bas)
+      spotSecondaryAngle,                                                           // angle plus large
+      spotSecondaryConcentration                                                    // concentration faible
+    );
   }
+}
+
+// PAS UTILISÉE ENCORE : J'ai fait ça, je me suis dit que ça pouvait être utile pour vérifier si c'était proche de l'extérieur.
+// Fonction pour déterminer si le joueur est proche d'une entrée/sortie
+// pour préserver les couleurs de l'extérieur visibles depuis l'intérieur
+boolean estProcheEntreeSortie() {
+  // Vérifier si le joueur est proche d'une entrée/sortie
+  int cellX = int(posX - DECALAGES[niveauActuel]);
+  int cellY = int(posY - DECALAGES[niveauActuel]);
+  
+  // Distance maximale à laquelle la lumière extérieure est visible
+  float distanceMax = 3.0;
+  
+  // Vérifier les cellules voisines pour trouver une sortie vers l'extérieur
+  for (int i = -1; i <= 1; i++) {
+    for (int j = -1; j <= 1; j++) {
+      int checkX = cellX + i;
+      int checkY = cellY + j;
+      
+      // Vérifier si la cellule est en dehors des limites du labyrinthe (donc extérieur)
+      if (checkX < 0 || checkX >= LAB_SIZES[niveauActuel] || 
+          checkY < 0 || checkY >= LAB_SIZES[niveauActuel]) {
+        
+        // Calculer la distance entre le joueur et cette cellule
+        float distance = sqrt(i*i + j*j);
+        
+        // Si la distance est inférieure à la distance maximale, le joueur est proche d'une sortie
+        if (distance < distanceMax) {
+          return true;
+        }
+      }
+    }
+  }
+  
+  return false;
 }
 
 // Petite fonction d'accélération pour des animations moins saccadées.

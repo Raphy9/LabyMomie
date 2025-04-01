@@ -178,14 +178,21 @@ void draw() {
 void renderPyramide() {
   // Pyramide d'origine (existante)
   pushMatrix();
+  translate(0, 0, -1);
   shape(niveauxShapes.get(NIVEAUACTUEL));
-  renderPyramideLisseExterieure(300, 21, 20);
+  renderPyramideLisseExterieure(300, 21, 20, false);
   popMatrix();
 
   // Deuxième pyramide (à gauche)
   pushMatrix();
-  translate(470, -229, 0);
-  renderPyramideLisseExterieure(220, 18, 17);
+  translate(550, -229, -5);
+  renderPyramideLisseExterieure(220, 18, 17, true);
+  popMatrix();
+  
+  // 3e pyramide
+  pushMatrix();
+  translate(-420, +229,-50);
+  renderPyramideLisseExterieure(240, 16, 20, true);
   popMatrix();
 }
 

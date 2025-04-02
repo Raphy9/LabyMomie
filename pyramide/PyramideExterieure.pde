@@ -98,11 +98,10 @@ textureWrap(REPEAT);
   }
   else {
     beginShape(QUADS);
-    fill(0);
-    //texture(textureStoneJaune); si tu veux changer la texture
+    texture(texturePorte);
     vertex(20, 0, 20, 0, 0);  
-    vertex(40, 0, 20, 0, 0);   
-    vertex(40, 0, 0, 0, 1); 
+    vertex(40, 0, 20, 1, 0);   
+    vertex(40, 0, 0, 1, 1); 
     vertex(20, 0, 0, 0, 1); 
     endShape(QUADS);
   }
@@ -185,12 +184,11 @@ textureWrap(REPEAT);
    }
    else {
     beginShape(QUADS);
-    fill(0);
-    //texture(textureStoneJaune); si tu veux changer la texture
+    texture(texturePorte);
     vertex(baseSize, baseSize-40, 20, 0, 0);  
-    vertex(baseSize, baseSize-20,   20, 0, 0);   
-    vertex(baseSize, baseSize-20,   0, 0, 0); 
-    vertex(baseSize, baseSize-40, 0, 1, 1); 
+    vertex(baseSize, baseSize-20,   20, 1, 0);   
+    vertex(baseSize, baseSize-20,   0, 1, 1); 
+    vertex(baseSize, baseSize-40, 0, 0, 1); 
     endShape(QUADS);
    }
 

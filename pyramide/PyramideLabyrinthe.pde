@@ -14,8 +14,10 @@ boolean estExterieur = false; // Si le joueur est à l'extérieur ou pas.
 
 // Textures
 PImage textureStone;
+PImage texturePorte;
 PImage textureSable;
 PImage textureStoneJaune;
+PImage textureporteJaune;
 PImage textureCiel;
 
 float time = 0;
@@ -30,7 +32,8 @@ void setup() {
   if (textureStone == null) {
     System.out.println("La texture n'existe pas");
   }
-  
+  texturePorte = loadImage("porte.png");
+  texturePorte = createTextureJaune(texturePorte);
   textureStoneJaune = createTextureJaune(textureStone);
   textureSable = createTextureSable();
   

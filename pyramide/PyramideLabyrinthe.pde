@@ -35,7 +35,7 @@ void setup() {
   texturePorte = loadImage("porte.png");
   texturePorte = createTextureJaune(texturePorte);
   textureStoneJaune = createTextureJaune(textureStone);
-  textureSable = createTextureSable();
+  textureSable = loadImage("desert.png");
   
   textureCiel = loadImage("ciel.png");
   

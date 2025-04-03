@@ -41,30 +41,6 @@ void genererSolDesertique() {
   }
 }
 
-PImage createTextureSable() {
-  PImage result = createImage(256, 256, RGB);
-  result.loadPixels();
-  for (int y = 0; y < result.height; y++) {
-    for (int x = 0; x < result.width; x++) {
-      float r = 240 + random(-70, 15);
-      float g = 210 + random(-70, 15);
-      float b = 130 + random(-20, 15);
-      
-      // On ajoute du bruit pour la texture granuleuse
-      float n = noise(x * 0.05, y * 0.05) * 30;
-      
-      result.pixels[y * result.width + x] = color(
-        constrain(r - n, 200, 255),
-        constrain(g - n, 170, 230),
-        constrain(b - n, 80, 150)
-      );
-    }
-  }
-  
-  result.updatePixels();
-  return result;
-}
-
 void renderCiel() {
   pushMatrix();
   
@@ -132,22 +108,16 @@ void renderSolDesertique(boolean light) {
   if( light ){
     directionalLight(240, 175, 44, 0.5, 0.5, -1);
   }
-   //resetShader();   // sinon ça fait un sol vert bizarre 
-  pushMatrix();
-  fill(255, 251, 0); // même couleur que pour les murs extérieurs.
-  popMatrix();
-  // Appliquer la texture de sable
-  texture(textureSable);
   
   // Dessiner la grille de quads avec hauteur modulée (pour obtenir un effet un peu vague)
   for (int i = 0; i < TAILLE_DESERT-1; i++) {
     for (int j = 0; j < TAILLE_DESERT-1; j++) {
       beginShape(QUADS);
       texture(textureSable);
-      vertex(i*20, j*20, hauteursSol[i][j], i/float(TAILLE_DESERT), j/float(TAILLE_DESERT));
-      vertex((i+1)*20, j*20, hauteursSol[i+1][j], (i+1)/float(TAILLE_DESERT), j/float(TAILLE_DESERT));
-      vertex((i+1)*20, (j+1)*20, hauteursSol[i+1][j+1], (i+1)/float(TAILLE_DESERT), (j+1)/float(TAILLE_DESERT));
-      vertex(i*20, (j+1)*20, hauteursSol[i][j+1], i/float(TAILLE_DESERT), (j+1)/float(TAILLE_DESERT));
+      vertex(i*20, j*20, hauteursSol[i][j], 0, 0);
+      vertex((i+1)*20, j*20, hauteursSol[i+1][j], 1, 0);
+      vertex((i+1)*20, (j+1)*20, hauteursSol[i+1][j+1], 1, 1);
+      vertex(i*20, (j+1)*20, hauteursSol[i][j+1], 0, 1);
       
       endShape();
     }

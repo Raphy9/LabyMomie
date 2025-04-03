@@ -23,7 +23,29 @@ void gestionDeplacements() {
   if (isKeyDownPressed) {
     moveBackward();
   }
+  revelerZoneAutourDuJoueur();
 }
+
+void revelerZoneAutourDuJoueur() {
+  int px = int(posX - DECALAGES[niveauActuel]);
+  int py = int(posY - DECALAGES[niveauActuel]);
+  
+  int rayon = 3;
+  
+  for (int y = py - rayon; y <= py + rayon; y++) {
+    for (int x = px - rayon; x <= px + rayon; x++) {
+      if (x >= 0 && x < LAB_SIZES[niveauActuel] && 
+          y >= 0 && y < LAB_SIZES[niveauActuel]) {
+        // On considère la distance si on veut un vrai cercle de rayon 3
+        float dist = dist(px, py, x, y);
+        if (dist <= rayon) {
+          decouvert[niveauActuel][y][x] = true;
+        }
+      }
+    }
+  }
+}
+
 
 // Cette fonction est appelée lorsqu'une touche est relâchée
 void keyReleased() {

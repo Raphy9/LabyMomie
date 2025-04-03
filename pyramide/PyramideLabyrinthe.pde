@@ -11,6 +11,7 @@ int anim = 0;
 int animMode = 0; // 0 = pas d'animation, 1 = animation de translation, 2 = animation de rotation
 int niveauActuel = 0; // Niveau actuel du joueur (0 = base, 1 = milieu, 2 = sommet)
 boolean estExterieur = false; // Si le joueur est à l'extérieur ou pas.
+boolean[][][] decouvert;
 
 // Textures
 PImage textureStone;
@@ -57,6 +58,18 @@ void setup() {
   // Chargement des niveaux
   for (int niveau = 0; niveau < NIVEAUX; niveau++) {
     niveauxShapes.add(genererShapeNiveau(niveau));
+  }
+  
+  decouvert = new boolean[NIVEAUX][][];
+  
+  for (int niv = 0; niv < NIVEAUX; niv++) {
+    decouvert[niv] = new boolean[LAB_SIZES[niv]][LAB_SIZES[niv]];
+    // Par défaut, tout est false => "non découvert"
+    for (int j = 0; j < LAB_SIZES[niv]; j++) {
+      for (int i = 0; i < LAB_SIZES[niv]; i++) {
+        decouvert[niv][j][i] = false;
+      }
+    }
   }
 
   

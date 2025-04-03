@@ -18,23 +18,55 @@ void drawMiniMap() {
   fill(255);
   text("Niveau: " + niveauActuel, mapX, mapY-10);
   
-  // Dessiner le labyrinthe du niveau actuel
-  for (int j=0; j<LAB_SIZES[niveauActuel]; j++) {
-    for (int i=0; i<LAB_SIZES[niveauActuel]; i++) {
+for (int j = 0; j < LAB_SIZES[niveauActuel]; j++) {
+  for (int i = 0; i < LAB_SIZES[niveauActuel]; i++) {
+    
+    // 1) Vérifier si on est en bordure du labyrinthe
+    boolean isBordure = 
+      (i == 0 || i == LAB_SIZES[niveauActuel] - 1
+       || j == 0 || j == LAB_SIZES[niveauActuel] - 1);
+    
+    // 2) Si bordure, on l’affiche quoi qu’il arrive :
+    if (isBordure) {
       if (labyrinthes[niveauActuel][j][i] == '#') {
-        fill(100, 100, 100);
+        fill(100, 100, 100); // mur
         rect(mapX + i*cellSize, mapY + j*cellSize, cellSize, cellSize);
       }
       else if (labyrinthes[niveauActuel][j][i] == 'E') {
-        fill(0, 0, 255);
+        fill(0, 0, 255);     // escalier montant
         rect(mapX + i*cellSize, mapY + j*cellSize, cellSize, cellSize);
       }
       else if (labyrinthes[niveauActuel][j][i] == 'D') {
-        fill(255, 0, 0);
+        fill(255, 0, 0);     // escalier descendant
         rect(mapX + i*cellSize, mapY + j*cellSize, cellSize, cellSize);
       }
+      // else : l'entrée, donc on ne dessine rien
+      continue; // on passe à la prochaine cellule
+    }
+    
+    // 3) Si on est **à l’intérieur**, on dessine seulement si c’est découvert :
+    if (!decouvert[niveauActuel][j][i]) {
+      fill(0); // non exploré => noir
+      rect(mapX + i*cellSize, mapY + j*cellSize, cellSize, cellSize);
+      continue;
+    }
+    
+    // 4) Cellule intérieure + découverte => on l’affiche normalement
+    if (labyrinthes[niveauActuel][j][i] == '#') {
+      fill(100, 100, 100); // mur
+      rect(mapX + i*cellSize, mapY + j*cellSize, cellSize, cellSize);
+    }
+    else if (labyrinthes[niveauActuel][j][i] == 'E') {
+      fill(0, 0, 255);
+      rect(mapX + i*cellSize, mapY + j*cellSize, cellSize, cellSize);
+    }
+    else if (labyrinthes[niveauActuel][j][i] == 'D') {
+      fill(255, 0, 0);
+      rect(mapX + i*cellSize, mapY + j*cellSize, cellSize, cellSize);
     }
   }
+}
+
   
   // On dessine ici la position du joueur
   fill(0, 255, 0);

@@ -222,6 +222,11 @@ void checkMummyCollision() {
   if(distance < collisionDistance) {
     // Le joueur est en collision avec la momie, retour au menu
     currentState = 0;
+    posX = 1.4;
+    posY = 1.0;
+    posZ = HAUTEURS_NIVEAUX[0];
+    dirX = 0;
+    dirY = 1;
     // Optionnel : réinitialiser la position du joueur ou effectuer d'autres actions
     println("Collision avec la momie : retour au menu !");
   }

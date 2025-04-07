@@ -111,9 +111,6 @@ textureWrap(REPEAT);
   // Face 2 (arrière)
   beginShape(TRIANGLES);
     texture(textureStoneJaune);
-    //vertex(baseSize, 0,     20,     0,   0);
-    //vertex(baseSize, baseSize, 20, 20,   0);
-    
     vertex(baseSize/2 * (1+t), baseSize/2 * (1+t), 0, 0, 0);
     vertex(baseSize/2 * (1-t), baseSize/2 * (1+t), 0, 20, 0);
     vertex(baseSize/2, baseSize/2, apexZ, 10, 20); 

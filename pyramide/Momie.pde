@@ -24,6 +24,9 @@ int mummyNiveau = 0;     // Niveau actuel de la momie dans la pyramide
 float mummySpeed = 0.08; // Vitesse de déplacement de la momie
 int mummyMoveTimer = 0;  // Compteur pour changer de direction
 int mummyMoveInterval = 40; // Intervalle pour changer de direction
+//var pr la pos de la momie
+PVector mummyPos = new PVector(-688, 300, -1100);
+
 
 void initMummyPosition() {
   // On essaie plusieurs positions jusqu'à en trouver une valide.
@@ -191,7 +194,7 @@ void updateMummy() {
   // On vérifie si la position mènerait à l'extérieur (entrée/sortie du labyrinthe)
   else if (cellX == 0 || cellX == LAB_SIZES[mummyNiveau]-1 || 
            cellY == 0 || cellY == LAB_SIZES[mummyNiveau]-1) {
-    // Si c'est une entrée ou sortie,on ne permet à la momie de s'y déplacer
+    // Si c'est une entrée ou sortie, on ne permet pas à la momie de s'y déplacer
     if (labyrinthes[mummyNiveau][cellY][cellX] == ' ' && 
         ((cellX == 0) || (cellX == LAB_SIZES[mummyNiveau]-1) || 
          (cellY == 0) || (cellY == LAB_SIZES[mummyNiveau]-1))) {
@@ -236,7 +239,11 @@ void updateMummy() {
   if (checkIfMummyOutside()) {
     initMummyPosition();
   }
+  
+  // Mise à jour de la position globale de la momie
+  mummyPos.set(mummyPosX * 20, mummyPosY * 20, HAUTEURS_NIVEAUX[mummyNiveau]);
 }
+
 
 //=====================FONCTION  MOMIE===================================
 // ==========================================================

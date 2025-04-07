@@ -13,6 +13,8 @@ int niveauActuel = 0; // Niveau actuel du joueur (0 = base, 1 = milieu, 2 = somm
 boolean estExterieur = false; // Si le joueur est à l'extérieur ou pas.
 boolean[][][] decouvert;
 
+
+
 // Textures
 PImage textureStone;
 PImage texturePorte;
@@ -90,6 +92,25 @@ void setup() {
 }
 
 void draw() {
+  background(0);
+  
+  // Gestion du Menu
+  if (currentState == 0) {
+    // Affichage du menu
+    drawMenu();
+  } else if (currentState == 1) {
+    // Affichage de ta scène / jeu
+    drawGame();
+  }
+  
+}
+
+
+
+// Seuil de collision (à ajuster selon tes besoins)
+float collisionDistance = 50;
+
+void drawGame(){
   float camX, camY, camZ, lookX, lookY, lookZ;
   
   if (anim > 0) {
@@ -164,13 +185,15 @@ void draw() {
   
   updateMummy();
   
+  // Vérifier la collision entre le joueur et la momie
+  checkMummyCollision();
+  
   perspective(PI/3.0, float(width)/float(height), 1, 1000);
   
   estExterieur = checkSiExterieur();
   
   resetShader();
   noTint();
-  
   
   configLights();
   
@@ -180,15 +203,32 @@ void draw() {
   
   renderMummy();
   
-  // On réinitialise la teinte pour les éléments suivants
   noTint();
   
-  // Afficher les indications pour les escaliers
   gererEscaliers();
   
   noLights(); // sinon les lumières vont affecter la minimap.
   drawMiniMap();
 }
+
+// Fonction pour vérifier si le joueur entre en collision avec la momie
+void checkMummyCollision() {
+  // Calculer la distance entre le joueur et la momie en prenant en compte l'échelle utilisée (ici, multiplication par 20)
+  float dx = posX*20 - mummyPos.x;
+  float dy = posY*20 - mummyPos.y;
+  float dz = posZ - mummyPos.z;
+  float distance = sqrt(dx*dx + dy*dy + dz*dz);
+  
+  if(distance < collisionDistance) {
+    // Le joueur est en collision avec la momie, retour au menu
+    currentState = 0;
+    // Optionnel : réinitialiser la position du joueur ou effectuer d'autres actions
+    println("Collision avec la momie : retour au menu !");
+  }
+}
+
+
+
 
 // Pour la pyramide complète
 void renderPyramide() {
@@ -271,7 +311,7 @@ boolean estProcheEntreeSortie() {
   // Vérifier les cellules voisines pour trouver une sortie vers l'extérieur
   for (int i = -1; i <= 1; i++) {
     for (int j = -1; j <= 1; j++) {
-      int checkX = cellX + i;
+      int checkX = cellX + i; 
       int checkY = cellY + j;
       
       // Vérifier si la cellule est en dehors des limites du labyrinthe (donc extérieur)

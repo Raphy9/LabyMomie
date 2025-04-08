@@ -1,5 +1,4 @@
-//Variable pour le Menu : 
-// 0 : menu, 1 : jeu (ta scène actuelle)
+// 0 : menu, 1 : jeu 
 int currentState = 0;
 
 // Pour la rotation de la vue 360° dans le menu

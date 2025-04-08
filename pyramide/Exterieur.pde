@@ -2,6 +2,9 @@ float[][] hauteursSol;
 // Le terrain  l'extérieur
 int TAILLE_DESERT = 150;
 
+// Shader pour simuler les grains de sable volant dans le vent
+PShader sandstormShader;
+
 PImage createTextureCiel() {
   PImage result = createImage(512, 512, RGB);
   result.loadPixels();
@@ -30,13 +33,40 @@ PImage createTextureCiel() {
   return result;
 }
 
+// Fonction pour initialiser le shader de tempête de sable
+void initSandstormShader() {
+  sandstormShader = loadShader("sandstormFragment.glsl", "sandstormVertex.glsl");
+  
+  // Initialisation des paramètres du shader
+  sandstormShader.set("resolution", float(width), float(height));
+  sandstormShader.set("windDirection", 0.8, 0.2); // Direction du vent (x, y)
+  sandstormShader.set("windStrength", 1.5); // Force du vent (augmentée)
+  sandstormShader.set("particleDensity", 1.2); // Densité des particules (augmentée)
+}
+
+// Fonction pour mettre à jour les paramètres du shader de tempête de sable
+void updateSandstormShader() {
+  // Mise à jour du temps pour l'animation
+  sandstormShader.set("time", time);
+  
+  // Variation de la force du vent avec le temps pour un effet plus naturel
+  float windVariation = sin(time * 0.1) * 1.0 + 0.4; // Permet de gérer l'épaisseur des grains de sable.
+  sandstormShader.set("windStrength", windVariation);
+  
+  // Variation légère de la direction du vent
+  float windDirX = 0.8 + sin(time * 2) * 0.01;
+  float windDirY = 0.2 + cos(time * 2) * 0.15;
+  sandstormShader.set("windDirection", windDirX, windDirY);
+}
+
+
 void genererSolDesertique() {
   hauteursSol = new float[TAILLE_DESERT][TAILLE_DESERT];
   
   for (int i = 0; i < TAILLE_DESERT; i++) {
     for (int j = 0; j < TAILLE_DESERT; j++) {
       // On utilise ici du 'bruit' pour moduler la hauteur
-      hauteursSol[i][j] = map(noise(i/10.0, j/10.0), 0, 1, -2, 2);
+      hauteursSol[i][j] = map(noise(i/14.0, j/14.0), 0, 1, -8, 8);
     }
   }
 }
@@ -101,6 +131,15 @@ void renderCiel() {
   popMatrix();
 }
 
+// Fonction pour appliquer l'effet de tempête de sable
+void applySandstormEffect() {
+  // Mettre à jour les paramètres du shader
+  updateSandstormShader();
+  
+  // Appliquer le shader comme filtre post-traitement
+  filter(sandstormShader);
+}
+
 void renderSolDesertique(boolean light) {
   pushMatrix();
   // Positionner le sol en dessous de la pyramide
@@ -108,7 +147,6 @@ void renderSolDesertique(boolean light) {
   if( light ){
     directionalLight(240, 175, 44, 0.5, 0.5, -1);
   }
-  
   // Dessiner la grille de quads avec hauteur modulée (pour obtenir un effet un peu vague)
   for (int i = 0; i < TAILLE_DESERT-1; i++) {
     for (int j = 0; j < TAILLE_DESERT-1; j++) {

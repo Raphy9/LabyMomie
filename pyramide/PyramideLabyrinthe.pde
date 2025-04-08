@@ -29,7 +29,7 @@ void setup() {
   frameRate(20);
   randomSeed(2);
   size(1000, 1000, P3D);
-  
+  surface.setTitle("Des momies et des pyramides !");
   // Chargement des textures
   textureStone = loadImage("stone.jpg");
   if (textureStone == null) {
@@ -43,6 +43,9 @@ void setup() {
   textureCiel = loadImage("ciel.png");
   
   textureMode(NORMAL);
+  
+  // Initialisation du shader pour la tempête de sable
+  initSandstormShader();
   
   // Initialisaton Momie
   mummyGroup = createMummy();
@@ -94,6 +97,9 @@ void setup() {
 void draw() {
   background(0);
   
+  // Mise à jour du temps pour les shaders
+  time += 0.05;
+  
   // Gestion du Menu
   if (currentState == 0) {
     // Affichage du menu
@@ -106,9 +112,8 @@ void draw() {
 }
 
 
-
-// Seuil de collision (à ajuster selon tes besoins)
-float collisionDistance = 50;
+// Seuil de collision avec la momie
+float collisionDistance = 5;
 
 void drawGame(){
   float camX, camY, camZ, lookX, lookY, lookZ;
@@ -174,9 +179,6 @@ void drawGame(){
     renderCiel();
   }
   
-  // Mise à jour du temps pour les shaders
-  time += 0.05;
-  
   if (anim > 0) {
     anim--;
   }
@@ -206,7 +208,10 @@ void drawGame(){
   noTint();
   
   gererEscaliers();
-  
+    // Appliquer l'effet de tempête de sable uniquement si le joueur est à l'extérieur
+  if (estExterieur) {
+    applySandstormEffect();
+  }
   noLights(); // sinon les lumières vont affecter la minimap.
   drawMiniMap();
 }

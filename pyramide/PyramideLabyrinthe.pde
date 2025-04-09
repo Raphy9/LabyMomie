@@ -66,18 +66,8 @@ void setup() {
   }
   
   decouvert = new boolean[NIVEAUX][][];
-  
-  for (int niv = 0; niv < NIVEAUX; niv++) {
-    decouvert[niv] = new boolean[LAB_SIZES[niv]][LAB_SIZES[niv]];
-    // Par défaut, tout est false => "non découvert"
-    for (int j = 0; j < LAB_SIZES[niv]; j++) {
-      for (int i = 0; i < LAB_SIZES[niv]; i++) {
-        decouvert[niv][j][i] = false;
-      }
-    }
-  }
 
-  
+  initBrouillardMiniMap();
   // Initialisation des variables de position et direction (jai repris ça de mon labyrinthe de base)
   posX = 1.4;
   posY = 1.0;
@@ -232,12 +222,23 @@ void checkMummyCollision() {
     posZ = HAUTEURS_NIVEAUX[0];
     dirX = 0;
     dirY = 1;
+    initBrouillardMiniMap();
     // Optionnel : réinitialiser la position du joueur ou effectuer d'autres actions
     println("Collision avec la momie : retour au menu !");
   }
 }
 
-
+void initBrouillardMiniMap() {
+  for (int niv = 0; niv < NIVEAUX; niv++) {
+    decouvert[niv] = new boolean[LAB_SIZES[niv]][LAB_SIZES[niv]];
+    // Par défaut, tout est false => "non découvert"
+    for (int j = 0; j < LAB_SIZES[niv]; j++) {
+      for (int i = 0; i < LAB_SIZES[niv]; i++) {
+        decouvert[niv][j][i] = false;
+      }
+    }
+  }
+}
 
 
 // Pour la pyramide complète

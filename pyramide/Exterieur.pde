@@ -33,7 +33,6 @@ PImage createTextureCiel() {
   return result;
 }
 
-// Fonction pour initialiser le shader de tempête de sable
 void initSandstormShader() {
   sandstormShader = loadShader("sandstormFragment.glsl", "sandstormVertex.glsl");
   
@@ -41,7 +40,6 @@ void initSandstormShader() {
   sandstormShader.set("resolution", float(width), float(height));
   sandstormShader.set("windDirection", 0.8, 0.2); // Direction du vent (x, y)
   sandstormShader.set("windStrength", 1.5); // Force du vent (augmentée)
-  sandstormShader.set("particleDensity", 1.2); // Densité des particules (augmentée)
 }
 
 // Fonction pour mettre à jour les paramètres du shader de tempête de sable
@@ -50,7 +48,15 @@ void updateSandstormShader() {
   sandstormShader.set("time", time);
   
   // Variation de la force du vent avec le temps pour un effet plus naturel
-  float windVariation = sin(time * 0.1) * 1.0 + 0.4; // Permet de gérer l'épaisseur des grains de sable.
+  // Amplitude augmentée pour des pics plus intenses
+  float windVariation = sin(time * 0.1) * 1.0 + 1.2; // Valeur de base plus élevée avec forte amplitude
+  
+  // Assurer que la force du vent tombe à presque zéro à certains moments
+  // pour que le sable disparaisse complètement
+  if (sin(time * 0.1) < -0.8) {
+    windVariation = 0.2; // Force minimale qui fait disparaître l'effet
+  }
+  
   sandstormShader.set("windStrength", windVariation);
   
   // Variation légère de la direction du vent
@@ -58,6 +64,7 @@ void updateSandstormShader() {
   float windDirY = 0.2 + cos(time * 2) * 0.15;
   sandstormShader.set("windDirection", windDirX, windDirY);
 }
+
 
 
 void genererSolDesertique() {

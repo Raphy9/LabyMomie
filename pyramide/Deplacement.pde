@@ -13,7 +13,7 @@ void gestionDeplacements() {
   if (isKeyRightPressed) {
     rotateRight();
   }
-  
+
   // Si la touche "flèche haut" est maintenue
   if (isKeyUpPressed) {
     moveForward();
@@ -23,19 +23,21 @@ void gestionDeplacements() {
   if (isKeyDownPressed) {
     moveBackward();
   }
-  revelerZoneAutourDuJoueur();
+  if (!estExterieur) {
+    revelerZoneAutourDuJoueur();
+  }
 }
 
 void revelerZoneAutourDuJoueur() {
   int px = int(posX - DECALAGES[niveauActuel]);
   int py = int(posY - DECALAGES[niveauActuel]);
-  
+
   int rayon = 3;
-  
+
   for (int y = py - rayon; y <= py + rayon; y++) {
     for (int x = px - rayon; x <= px + rayon; x++) {
-      if (x >= 0 && x < LAB_SIZES[niveauActuel] && 
-          y >= 0 && y < LAB_SIZES[niveauActuel]) {
+      if (x >= 0 && x < LAB_SIZES[niveauActuel] &&
+        y >= 0 && y < LAB_SIZES[niveauActuel]) {
         // On considère la distance si on veut un vrai cercle de rayon 3
         float dist = dist(px, py, x, y);
         if (dist <= rayon) {
@@ -49,6 +51,11 @@ void revelerZoneAutourDuJoueur() {
 
 // Cette fonction est appelée lorsqu'une touche est relâchée
 void keyReleased() {
+  if (keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 37) {
+    // Arrêter l'interpolation de déplacement :
+    isMoving = false;
+    animationTimer = 0;
+  }
   // Touche flèche haut
   if (keyCode == 38) {
     isKeyUpPressed = false;
@@ -71,16 +78,16 @@ void keyReleased() {
 void rotateLeft() {
   oldDirX = dirX;
   oldDirY = dirY;
-  
+
   float angle = -PI / 48;
   float tempDirX = dirX;
   dirX = dirX * cos(angle) - dirY * sin(angle);
   dirY = tempDirX * sin(angle) + dirY * cos(angle);
-  
+
   float longueur = sqrt(dirX * dirX + dirY * dirY);
   dirX /= longueur;
   dirY /= longueur;
-  
+
   animMode = 2;
   anim = 2;
 }
@@ -89,94 +96,103 @@ void rotateLeft() {
 void rotateRight() {
   oldDirX = dirX;
   oldDirY = dirY;
-  
+
   float angle = PI / 48;
   float tempDirX = dirX;
   dirX = dirX * cos(angle) - dirY * sin(angle);
   dirY = tempDirX * sin(angle) + dirY * cos(angle);
-  
+
   float longueur = sqrt(dirX * dirX + dirY * dirY);
   dirX /= longueur;
   dirY /= longueur;
-  
+
   animMode = 2;
   anim = 2;
 }
 
 void moveForward() {
   if (anim > 0) return;
-  float newPosX = posX + dirX * 0.25;
-  float newPosY = posY + dirY * 0.25;
+  float newPosX = posX + dirX * 0.6;
+  float newPosY = posY + dirY * 0.6;
   deplacerJoueur(newPosX, newPosY);
 }
 
 void moveBackward() {
   if (anim > 0) return;
-  float newPosX = posX - dirX * 0.25;
-  float newPosY = posY - dirY * 0.25;
+  float newPosX = posX - dirX * 0.6;
+  float newPosY = posY - dirY * 0.6;
   deplacerJoueur(newPosX, newPosY);
 }
 
 void deplacerJoueur(float newPosX, float newPosY) {
+  // Stocker la position actuelle pour l'interpolation
   oldPosX = posX;
   oldPosY = posY;
   oldPosZ = posZ;
-  float newPosZ = posZ;
-  animMode = 1;
-  anim = 3;
 
+  float newPosZ = posZ;  // En général, on ne change pas Z dans ce déplacement
+
+  // Initialisation de la cible en fonction de l'environnement
   if (estExterieur) {
-    posX = newPosX;
-    posY = newPosY;
-    posZ = newPosZ;
+    targetPosX = newPosX;
+    targetPosY = newPosY;
+    targetPosZ = newPosZ;
   } else {
     int cellX = int(newPosX - DECALAGES[niveauActuel]);
     int cellY = int(newPosY - DECALAGES[niveauActuel]);
 
     if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] &&
-        cellY >= 0 && cellY < LAB_SIZES[niveauActuel]) {
+      cellY >= 0 && cellY < LAB_SIZES[niveauActuel]) {
       if (labyrinthes[niveauActuel][cellY][cellX] != '#') {
         boolean canMove = true;
         float margin = 0.2;
 
         if (newPosX - (cellX + DECALAGES[niveauActuel]) < margin &&
-            cellX > 0 && labyrinthes[niveauActuel][cellY][cellX - 1] == '#')
+          cellX > 0 && labyrinthes[niveauActuel][cellY][cellX - 1] == '#')
           canMove = false;
 
         if ((cellX + 1 + DECALAGES[niveauActuel]) - newPosX < margin &&
-            cellX < LAB_SIZES[niveauActuel] - 1 && labyrinthes[niveauActuel][cellY][cellX + 1] == '#')
+          cellX < LAB_SIZES[niveauActuel] - 1 && labyrinthes[niveauActuel][cellY][cellX + 1] == '#')
           canMove = false;
 
         if (newPosY - (cellY + DECALAGES[niveauActuel]) < margin &&
-            cellY > 0 && labyrinthes[niveauActuel][cellY - 1][cellX] == '#')
+          cellY > 0 && labyrinthes[niveauActuel][cellY - 1][cellX] == '#')
           canMove = false;
 
         if ((cellY + 1 + DECALAGES[niveauActuel]) - newPosY < margin &&
-            cellY < LAB_SIZES[niveauActuel] - 1 && labyrinthes[niveauActuel][cellY + 1][cellX] == '#')
+          cellY < LAB_SIZES[niveauActuel] - 1 && labyrinthes[niveauActuel][cellY + 1][cellX] == '#')
           canMove = false;
 
         if (canMove) {
-          posX = newPosX;
-          posY = newPosY;
-          posZ = newPosZ;
+          targetPosX = newPosX;
+          targetPosY = newPosY;
+          targetPosZ = newPosZ;
         } else {
-          anim = 0;
+          // Le déplacement est bloqué par un mur
+          return;
         }
       } else {
-        anim = 0;
+        // La case ciblée est un mur
+        return;
       }
     } else {
-      posX = newPosX;
-      posY = newPosY;
-      posZ = newPosZ;
+      // Hors labyrinthe, on autorise le déplacement
+      targetPosX = newPosX;
+      targetPosY = newPosY;
+      targetPosZ = newPosZ;
     }
   }
+
+  // Démarrer l'animation du déplacement
+  animationTimer = 0;
+  isMoving = true;
 }
+
 
 
 void keyPressed() {
   if (anim > 0) return;
-  
+
   // Touche flèche haut
   if (keyCode == 38) {
     isKeyUpPressed = true;
@@ -199,12 +215,12 @@ void keyPressed() {
     // Vérifier si le joueur est sur un escalier montant
     int cellX = int(posX - DECALAGES[niveauActuel]);
     int cellY = int(posY - DECALAGES[niveauActuel]);
-    
-    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] && 
-        cellY >= 0 && cellY < LAB_SIZES[niveauActuel] &&
-        labyrinthes[niveauActuel][cellY][cellX] == 'E' &&
-        niveauActuel < NIVEAUX - 1) {
-      
+
+    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] &&
+      cellY >= 0 && cellY < LAB_SIZES[niveauActuel] &&
+      labyrinthes[niveauActuel][cellY][cellX] == 'E' &&
+      niveauActuel < NIVEAUX - 1) {
+
       // Monter d'un niveau avec animation
       animerMonteeDescente(niveauActuel + 1, 1 + DECALAGES[niveauActuel + 1], 1 + DECALAGES[niveauActuel + 1]);
       NIVEAUACTUEL++;
@@ -215,17 +231,16 @@ void keyPressed() {
     // Vérifier si le joueur est sur un escalier descendant
     int cellX = int(posX - DECALAGES[niveauActuel]);
     int cellY = int(posY - DECALAGES[niveauActuel]);
-    
-    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] && 
-        cellY >= 0 && cellY < LAB_SIZES[niveauActuel] &&
-        labyrinthes[niveauActuel][cellY][cellX] == 'D' &&
-        niveauActuel > 0) {
-      
+
+    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] &&
+      cellY >= 0 && cellY < LAB_SIZES[niveauActuel] &&
+      labyrinthes[niveauActuel][cellY][cellX] == 'D' &&
+      niveauActuel > 0) {
+
       // Descendre d'un niveau avec animation
-      animerMonteeDescente(niveauActuel - 1, (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1], 
-                          (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1]);
-                          NIVEAUACTUEL--;
+      animerMonteeDescente(niveauActuel - 1, (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1],
+        (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1]);
+      NIVEAUACTUEL--;
     }
   }
-  
 }

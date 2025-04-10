@@ -90,143 +90,7 @@ void genererLabyrinthe(int niveau) {
   }
 }
 
-void renderNiveauPyramide(int niveau) {
-  int labSize = LAB_SIZES[niveau];
-  float hauteurNiveau = HAUTEURS_NIVEAUX[niveau];
-  int decalage = DECALAGES[niveau];
-  
-  for (int j = 0; j < labSize; j++) {
-    for (int i = 0; i < labSize; i++) {
-      pushMatrix();
-      
-      // Pour l'effet pyramidal
-      translate((i+decalage)*20, (j+decalage)*20, hauteurNiveau);
-      
-      if (labyrinthes[niveau][j][i] == '#') {
-        // On utilise la texture jaune pour l'extérieur de la pyramide et l'entrée... mais je ne comprends pas pourquoi un bloc de mur à l'entrée est vert... haha il est jaune mainteannt mdr
-        boolean estExterieur = (i == 0 || i == labSize-1 || j == 0 || j == labSize-1);
-        
-        
-        // On dessine les murs
-        // Mur Nord (face avant)
-        if (j == 0 || labyrinthes[niveau][j-1][i] != '#') {
-          beginShape(QUADS);
-          if (estExterieur || (j == 0 && i == 1)) {
-            texture(textureStoneJaune);
-          } else {
-            texture(textureStone);
-          }
-          vertex(0, 0, 0, 0, 0);
-          vertex(20, 0, 0, 1, 0);
-          vertex(20, 0, 20, 1, 1);
-          vertex(0, 0, 20, 0, 1);
-          endShape();
-        }
-        
-        // Mur Sud (face arrière)
-        if (j == labSize-1 || labyrinthes[niveau][j+1][i] != '#') {
-          beginShape(QUADS);
-          // Pour gérer les couleurs de la texture en fonction de la position (sauf si tu veux mettre tout en jaune à l'intérieur...)
-          if (estExterieur) {
-            texture(textureStoneJaune);
-          } else {
-            texture(textureStone);
-          }
-          vertex(0, 20, 0, 0, 0);
-          vertex(20, 20, 0, 1, 0);
-          vertex(20, 20, 20, 1, 1);
-          vertex(0, 20, 20, 0, 1);
-          endShape();
-        }
-        
-        // Mur Est (face droite)
-        if (i == labSize-1 || labyrinthes[niveau][j][i+1] != '#') {
-          beginShape(QUADS);
-          if (estExterieur) {
-            texture(textureStoneJaune);
-          } else {
-            texture(textureStone);
-          }
-          vertex(20, 0, 0, 0, 0);
-          vertex(20, 20, 0, 1, 0);
-          vertex(20, 20, 20, 1, 1);
-          vertex(20, 0, 20, 0, 1);
-          endShape();
-        }
-        
-        // Mur Ouest (face gauche)
-        if (i == 0 || labyrinthes[niveau][j][i-1] != '#') {
-          beginShape(QUADS);
-          if (estExterieur) {
-            texture(textureStoneJaune);
-          } else {
-            texture(textureStone);
-          }
-          vertex(0, 0, 0, 0, 0);
-          vertex(0, 20, 0, 1, 0);
-          vertex(0, 20, 20, 1, 1);
-          vertex(0, 0, 20, 0, 1);
-          endShape();
-        }
-        
-        // Plafond (face supérieure)
-        beginShape(QUADS);
-        texture(textureStone);
-        vertex(0, 0, 20, 0, 0);
-        vertex(20, 0, 20, 1, 0);
-        vertex(20, 20, 20, 1, 1);
-        vertex(0, 20, 20, 0, 1);
-        endShape();
-        
-        // Sol (face inférieure)
-        beginShape(QUADS);
-        texture(textureStone);
-        vertex(0, 0, 0, 0, 0);
-        vertex(20, 0, 0, 1, 0);
-        vertex(20, 20, 0, 1, 1);
-        vertex(0, 20, 0, 0, 1);
-        endShape();
-      } 
-      else if (labyrinthes[niveau][j][i] == ' ') {
-        // Sol pour les cases vides - GRIS
-        fill(50, 50, 50);
-        noStroke();
-        beginShape(QUADS);
-        vertex(0, 0, 0, 0, 0);
-        vertex(20, 0, 0, 1, 0);
-        vertex(20, 20, 0, 1, 1);
-        vertex(0, 20, 0, 0, 1);
-        endShape();
-        
-        // Plafond pour les cases vides - GRIS
-        fill(50, 50, 50);
-        beginShape(QUADS);
-        vertex(0, 0, 20, 0, 0);
-        vertex(20, 0, 20, 1, 0);
-        vertex(20, 20, 20, 1, 1);
-        vertex(0, 20, 20, 0, 1);
-        endShape();
-      }
-      else if (labyrinthes[niveau][j][i] == 'E' || labyrinthes[niveau][j][i] == 'D') {
-        // Marqueur pour l'emplacement des escaliers
-        if (labyrinthes[niveau][j][i] == 'E') {
-          fill(0, 0, 255); // Bleu pour monter
-        } else {
-          fill(255, 0, 0); // Rouge pour descendre
-        }
-        noStroke();
-        beginShape(QUADS);
-        vertex(0, 0, 0, 0, 0);
-        vertex(20, 0, 0, 1, 0);
-        vertex(20, 20, 0, 1, 1);
-        vertex(0, 20, 0, 0, 1);
-        endShape();
-      }
-      
-      popMatrix();
-    }
-  }
-}
+
 
 PShape genererShapeNiveau(int niveau) {
   // Création d'un groupe global pour le niveau
@@ -256,7 +120,8 @@ PShape genererShapeNiveau(int niveau) {
           if (estExterieur || (j == 0 && i == 1)) {
             murNord.texture(textureStoneJaune);
           } else {
-            murNord.texture(textureStone);
+            //murNord.texture(textureStone);
+            murNord.texture(textureStoneJaune);
           }
           murNord.vertex(0, 0, 0, 0, 0);
           murNord.vertex(20, 0, 0, 1, 0);
@@ -274,7 +139,8 @@ PShape genererShapeNiveau(int niveau) {
           if (estExterieur) {
             murSud.texture(textureStoneJaune);
           } else {
-            murSud.texture(textureStone);
+            //murSud.texture(textureStone);
+            murSud.texture(textureStoneJaune);
           }
           murSud.vertex(0, 20, 0, 0, 0);
           murSud.vertex(20, 20, 0, 1, 0);
@@ -292,7 +158,8 @@ PShape genererShapeNiveau(int niveau) {
           if (estExterieur) {
             murEst.texture(textureStoneJaune);
           } else {
-            murEst.texture(textureStone);
+            //murEst.texture(textureStone);
+            murEst.texture(textureStoneJaune);
           }
           murEst.vertex(20, 0, 0, 0, 0);
           murEst.vertex(20, 20, 0, 1, 0);
@@ -310,7 +177,8 @@ PShape genererShapeNiveau(int niveau) {
           if (estExterieur) {
             murOuest.texture(textureStoneJaune);
           } else {
-            murOuest.texture(textureStone);
+            //murOuest.texture(textureStone);
+            murOuest.texture(textureStoneJaune);
           }
           murOuest.vertex(0, 0, 0, 0, 0);
           murOuest.vertex(0, 20, 0, 1, 0);
@@ -324,7 +192,8 @@ PShape genererShapeNiveau(int niveau) {
         // Plafond (face supérieure)
         PShape plafond = createShape();
         plafond.beginShape(QUADS);
-        plafond.texture(textureStone);
+        //plafond.texture(textureStone);
+        plafond.texture(textureStoneJaune);
         plafond.vertex(0, 0, 20, 0, 0);
         plafond.vertex(20, 0, 20, 1, 0);
         plafond.vertex(20, 20, 20, 1, 1);
@@ -336,7 +205,8 @@ PShape genererShapeNiveau(int niveau) {
         // Sol (face inférieure)
         PShape sol = createShape();
         sol.beginShape(QUADS);
-        sol.texture(textureStone);
+        //sol.texture(textureStone);
+        sol.texture(textureStoneJaune);
         sol.vertex(0, 0, 0, 0, 0);
         sol.vertex(20, 0, 0, 1, 0);
         sol.vertex(20, 20, 0, 1, 1);
@@ -350,7 +220,8 @@ PShape genererShapeNiveau(int niveau) {
         PShape solVide = createShape();
         solVide.beginShape(QUADS);
         solVide.noStroke();
-        solVide.fill(50, 50, 50);
+        //solVide.fill(50, 50, 50);
+        solVide.texture(textureSolPlafondJaune);
         solVide.vertex(0, 0, 0, 0, 0);
         solVide.vertex(20, 0, 0, 1, 0);
         solVide.vertex(20, 20, 0, 1, 1);
@@ -363,7 +234,8 @@ PShape genererShapeNiveau(int niveau) {
         PShape plafondVide = createShape();
         plafondVide.beginShape(QUADS);
         plafondVide.noStroke();
-        plafondVide.fill(50, 50, 50);
+        //plafondVide.fill(50, 50, 50);
+        plafondVide.texture(textureSolPlafondJaune);
         plafondVide.vertex(0, 0, 20, 0, 0);
         plafondVide.vertex(20, 0, 20, 1, 0);
         plafondVide.vertex(20, 20, 20, 1, 1);

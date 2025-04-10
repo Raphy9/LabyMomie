@@ -6,6 +6,13 @@ char[][][][] sides;
 float posX, posY, posZ, dirX, dirY;
 float oldDirX, oldDirY;
 float oldPosX, oldPosY, oldPosZ;
+float targetPosX, targetPosY, targetPosZ;  // Position cible à atteindre
+
+// Variables d’animation
+float animationTimer = 0;                // Timer qui suit l’avancement de l’animation
+float animationDuration = 0.2;           // Durée de l’animation (en secondes) – à ajuster selon ton goût
+boolean isMoving = false;                // True si le joueur est en train de se déplacer
+
 float hauteur = 10; // Hauteur caméra
 int anim = 0;
 int animMode = 0; // 0 = pas d'animation, 1 = animation de translation, 2 = animation de rotation
@@ -22,10 +29,12 @@ PImage textureSable;
 PImage textureStoneJaune;
 PImage textureporteJaune;
 PImage textureCiel;
+PImage textureSolPlafond;
+PImage textureSolPlafondJaune;
 
 float time = 0;
 
-void setup() { 
+void setup() {
   frameRate(20);
   randomSeed(2);
   size(1000, 1000, P3D);
@@ -36,35 +45,37 @@ void setup() {
     System.out.println("La texture n'existe pas");
   }
   texturePorte = loadImage("porte.png");
+  textureSolPlafond = loadImage("textureSolPlafond.png");
+  textureSolPlafondJaune = createTextureJaune(textureSolPlafond);
   texturePorte = createTextureJaune(texturePorte);
   textureStoneJaune = createTextureJaune(textureStone);
   textureSable = loadImage("desert.png");
-  
+
   textureCiel = loadImage("ciel.png");
-  
+
   textureMode(NORMAL);
-  
+
   // Initialisation du shader pour la tempête de sable
   initSandstormShader();
-  
+
   // Initialisaton Momie
   mummyGroup = createMummy();
-  
+
   // Initialisation des labyrinthes pour chaque niveau
   labyrinthes = new char[NIVEAUX][][];
   sides = new char[NIVEAUX][][][];
-  
+
   for (int niveau = 0; niveau < NIVEAUX; niveau++) {
     labyrinthes[niveau] = new char[LAB_SIZES[niveau]][LAB_SIZES[niveau]];
     sides[niveau] = new char[LAB_SIZES[niveau]][LAB_SIZES[niveau]][4];
     genererLabyrinthe(niveau);
   }
-  
+
   // Chargement des niveaux
   for (int niveau = 0; niveau < NIVEAUX; niveau++) {
     niveauxShapes.add(genererShapeNiveau(niveau));
   }
-  
+
   decouvert = new boolean[NIVEAUX][][];
 
   initBrouillardMiniMap();
@@ -86,10 +97,10 @@ void setup() {
 
 void draw() {
   background(0);
-  
+
   // Mise à jour du temps pour les shaders
   time += 0.05;
-  
+
   // Gestion du Menu
   if (currentState == 0) {
     // Affichage du menu
@@ -98,47 +109,64 @@ void draw() {
     // Affichage de ta scène / jeu
     drawGame();
   }
-  
 }
 
 
 // Seuil de collision avec la momie
 float collisionDistance = 5;
 
-void drawGame(){
+void drawGame() {
   float camX, camY, camZ, lookX, lookY, lookZ;
-  
+
+  // Calculer le delta temps approximatif en fonction du frameRate courant
+  float dt = 1.0 / frameRate;
+
+  // Effectuer l'interpolation de déplacement uniquement si aucune animation d'étage n'est active
+  if (isMoving && anim <= 0) {
+    animationTimer += dt;
+    float ratio = constrain(animationTimer / animationDuration, 0, 1);
+
+    // Appliquer une interpolation easing
+    float t = easeInOutQuad(ratio);
+    posX = lerp(oldPosX, targetPosX, t);
+    posY = lerp(oldPosY, targetPosY, t);
+    posZ = lerp(oldPosZ, targetPosZ, t);
+
+    // Arrêter l'animation une fois terminée
+    if (ratio >= 1) {
+      isMoving = false;
+    }
+  }
+
   if (anim > 0) {
     float ratio = float(anim) / 20.0;
-    
+
     if (animMode == 1) {
       float easeRatio = easeInOutQuad(1.0 - ratio);
-      
+
       camX = oldPosX*20 * (1-easeRatio) + posX*20 * easeRatio;
       camY = oldPosY*20 * (1-easeRatio) + posY*20 * easeRatio;
       camZ = oldPosZ * (1-easeRatio) + posZ * easeRatio + hauteur + sin(PI * easeRatio) * 2;
-      
+
       lookX = camX + dirX*20;
       lookY = camY + dirY*20;
       lookZ = camZ - hauteur;
-    } 
-    else if (animMode == 2) {
+    } else if (animMode == 2) {
       camX = posX*20;
       camY = posY*20;
       camZ = posZ + hauteur;
-      
+
       float interpDirX = oldDirX * ratio + dirX * (1-ratio);
       float interpDirY = oldDirY * ratio + dirY * (1-ratio);
-      
+
       float longueur = sqrt(interpDirX*interpDirX + interpDirY*interpDirY);
       interpDirX /= longueur;
       interpDirY /= longueur;
-      
+
       lookX = posX*20 + interpDirX*20;
       lookY = posY*20 + interpDirY*20;
       lookZ = posZ;
-    }
-    else {
+    } else {
       camX = posX*20;
       camY = posY*20;
       camZ = posZ + hauteur;
@@ -146,8 +174,7 @@ void drawGame(){
       lookY = posY*20 + dirY*20;
       lookZ = posZ;
     }
-  } 
-  else {
+  } else {
     camX = posX*20;
     camY = posY*20;
     camZ = posZ + hauteur;
@@ -155,50 +182,50 @@ void drawGame(){
     lookY = posY*20 + dirY*20;
     lookZ = posZ;
   }
-  
+
   background(100, 0, 255); // Fond bleu ciel
-  
+
   camera(
     camX, camY, camZ,
     camX + dirX*20, camY + dirY*20, camZ,
     0, 0, -1
-  );
-  
+    );
+
   // Dessiner le ciel uniquement si on est à l'extérieur
   if (estExterieur) {
     renderCiel();
   }
-  
+
   if (anim > 0) {
     anim--;
   }
-  
+
   gestionDeplacements();
-  
+
   updateMummy();
-  
+
   // Vérifier la collision entre le joueur et la momie
   checkMummyCollision();
-  
+
   perspective(PI/3.0, float(width)/float(height), 1, 1000);
-  
+
   estExterieur = checkSiExterieur();
-  
+
   resetShader();
   noTint();
-  
+
   configLights();
-  
+
   gestionRenderSol();
-  
+
   renderPyramide();
-  
+
   renderMummy();
-  
+
   noTint();
-  
+
   gererEscaliers();
-    // Appliquer l'effet de tempête de sable uniquement si le joueur est à l'extérieur
+  // Appliquer l'effet de tempête de sable uniquement si le joueur est à l'extérieur
   if (estExterieur) {
     applySandstormEffect();
   }
@@ -213,8 +240,8 @@ void checkMummyCollision() {
   float dy = posY*20 - mummyPos.y;
   float dz = posZ - mummyPos.z;
   float distance = sqrt(dx*dx + dy*dy + dz*dz);
-  
-  if(distance < collisionDistance) {
+
+  if (distance < collisionDistance) {
     // Le joueur est en collision avec la momie, retour au menu
     currentState = 0;
     posX = 1.4;
@@ -255,10 +282,10 @@ void renderPyramide() {
   translate(550, -229, -5);
   renderPyramideLisseExterieure(220, 18, 17, true);
   popMatrix();
-  
+
   // 3e pyramide
   pushMatrix();
-  translate(-420, +229,-50);
+  translate(-420, +229, -50);
   renderPyramideLisseExterieure(240, 16, 20, true);
   popMatrix();
 }
@@ -268,43 +295,31 @@ void configLights() {
   if (estExterieur) {
     // Éclairage extérieur (clair mais légèrement réduit)
     directionalLight(180, 180, 180, 0.5, 0.5, -1);
-    
+
     // Ajout d'une lumière ambiante faible pour éviter le noir complet dans les zones d'ombre
     ambientLight(40, 40, 50);
   } else {
     // Éclairage intérieur (très sombre avec effet de lampe torche)
-    
-    // Paramètres ajustables pour la lampe torche
-    float spotMainIntensity = 170;          // Intensité de la lampe torche principale (0-255)
-    float spotSecondaryIntensity = 110;      // Intensité de la lampe torche secondaire (0-255)
-    float spotMainAngle = PI/2;             // Angle du cône principal (en radians, PI/4 = 45°)
-    float spotSecondaryAngle = PI/2.5;      // Angle du cône secondaire (en radians)
-    float spotMainConcentration = 8;        // Concentration du faisceau principal (1-128)
-    float spotSecondaryConcentration = 2;   // Concentration du faisceau secondaire (1-128)
-    float falloffConstant = 0.0;            // Atténuation constante (0-1)
-    float falloffLinear = 0.048;             // Atténuation linéaire (0-1)
-    float falloffQuadratic = 0.0001;         // Atténuation quadratique (0-1)
-    
-    // Paramètres de falloff pour une atténuation réaliste de la lumière avec la distance
+
+    float falloffConstant   = 0.8;    // Atténuation constante
+    float falloffLinear     = 0.05;   // Atténuation linéaire
+    float falloffQuadratic  = 0.001;  // Atténuation quadratique
     lightFalloff(falloffConstant, falloffLinear, falloffQuadratic);
-    
-    // Effet de lampe torche principale - spotlight dans la direction du regard
-    spotLight(
-      spotMainIntensity, spotMainIntensity, spotMainIntensity * 1.13,  // couleur
-      posX*20, posY*20, posZ + hauteur - 2,                           // position légèrement devant la caméra
-      dirX, dirY, -0.2,                                               // direction (légèrement vers le bas)
-      spotMainAngle,                                                  // angle du cône
-      spotMainConcentration                                           // concentration
-    );
-    
-    // Lumière secondaire plus large et plus faible pour éclairer légèrement les environs
-    spotLight(
-      spotSecondaryIntensity, spotSecondaryIntensity, spotSecondaryIntensity * 1.2,  // couleur
-      posX*20, posY*20, posZ + hauteur,                                             // position à la caméra
-      dirX, dirY, -0.2,                                                             // direction (ici légèrement inclinée vers le bas)
-      spotSecondaryAngle,                                                           // angle plus large
-      spotSecondaryConcentration                                                    // concentration faible
-    );
+
+    // Couleur de la lumière (lanterne) : légèrement "chaude"
+    // Pour un effet "feu" : vers l'orangé/jaune
+    float r = 255;
+    float g = 200;
+    float b = 40;
+
+    // Position du joueur en "coordonnées Processing" (x20)
+    // + légère hauteur pour que la lumière soit au niveau du regard
+    float lx = posX * 20;
+    float ly = posY * 20;
+    float lz = posZ + hauteur;
+
+    // Lumière ponctuelle qui fera office de lanterne
+    ambientLight(r, g, b, lx, ly, lz);
   }
 }
 
@@ -315,23 +330,23 @@ boolean estProcheEntreeSortie() {
   // Vérifier si le joueur est proche d'une entrée/sortie
   int cellX = int(posX - DECALAGES[niveauActuel]);
   int cellY = int(posY - DECALAGES[niveauActuel]);
-  
+
   // Distance maximale à laquelle la lumière extérieure est visible
   float distanceMax = 3.0;
-  
+
   // Vérifier les cellules voisines pour trouver une sortie vers l'extérieur
   for (int i = -1; i <= 1; i++) {
     for (int j = -1; j <= 1; j++) {
-      int checkX = cellX + i; 
+      int checkX = cellX + i;
       int checkY = cellY + j;
-      
+
       // Vérifier si la cellule est en dehors des limites du labyrinthe (donc extérieur)
-      if (checkX < 0 || checkX >= LAB_SIZES[niveauActuel] || 
-          checkY < 0 || checkY >= LAB_SIZES[niveauActuel]) {
-        
+      if (checkX < 0 || checkX >= LAB_SIZES[niveauActuel] ||
+        checkY < 0 || checkY >= LAB_SIZES[niveauActuel]) {
+
         // Calculer la distance entre le joueur et cette cellule
         float distance = sqrt(i*i + j*j);
-        
+
         // Si la distance est inférieure à la distance maximale, le joueur est proche d'une sortie
         if (distance < distanceMax) {
           return true;
@@ -339,11 +354,15 @@ boolean estProcheEntreeSortie() {
       }
     }
   }
-  
+
   return false;
 }
 
-// Petite fonction d'accélération pour des animations moins saccadées.
+// Fonction d'easing pour un mouvement plus naturel (easeInOutQuad)
 float easeInOutQuad(float t) {
-  return t < 0.5 ? 2 * t * t : 1 - pow(-2 * t + 2, 2) / 2;
+  if (t < 0.5) {
+    return 2 * t * t;
+  } else {
+    return -1 + (4 - 2 * t) * t;
+  }
 }

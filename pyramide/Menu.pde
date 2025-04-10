@@ -68,7 +68,7 @@ void drawMenu() {
   translate(0,300,0);
   rotateX(PI/2);
   scale(5);
-  renderSolDesertique(false);
+  gestionRenderSol();
   popMatrix();
  
   

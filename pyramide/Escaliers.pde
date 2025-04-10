@@ -63,10 +63,10 @@ void animerMonteeDescente(int nouveauNiveau, float nouvellePosX, float nouvelleP
   // Mettre à jour le niveau actuel et la position
   niveauActuel = nouveauNiveau;
   posX = nouvellePosX+0.4;
-  posY = nouvellePosY;
+  posY = nouvellePosY+0.4;
   posZ = HAUTEURS_NIVEAUX[niveauActuel];
   
   // Démarrer l'animation
   animMode = 1;
-  anim = 40; // Animation plus longue pour la montée/descente
+  anim = 10; // Animation plus longue pour la montée/descente
 }

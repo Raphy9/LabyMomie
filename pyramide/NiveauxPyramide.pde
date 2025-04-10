@@ -99,6 +99,7 @@ PShape genererShapeNiveau(int niveau) {
   float hauteurNiveau = HAUTEURS_NIVEAUX[niveau];
   int decalage = DECALAGES[niveau];
   
+  noStroke();
   // Parcours de toutes les cases du labyrinthe du niveau
   for (int j = 0; j < labSize; j++) {
     for (int i = 0; i < labSize; i++) {
@@ -118,10 +119,10 @@ PShape genererShapeNiveau(int niveau) {
           PShape murNord = createShape();
           murNord.beginShape(QUADS);
           if (estExterieur || (j == 0 && i == 1)) {
-            murNord.texture(textureStoneJaune);
+            murNord.texture(textureStone);
           } else {
             //murNord.texture(textureStone);
-            murNord.texture(textureStoneJaune);
+            murNord.texture(textureStone);
           }
           murNord.vertex(0, 0, 0, 0, 0);
           murNord.vertex(20, 0, 0, 1, 0);
@@ -137,10 +138,10 @@ PShape genererShapeNiveau(int niveau) {
           PShape murSud = createShape();
           murSud.beginShape(QUADS);
           if (estExterieur) {
-            murSud.texture(textureStoneJaune);
+            murSud.texture(textureStone);
           } else {
             //murSud.texture(textureStone);
-            murSud.texture(textureStoneJaune);
+            murSud.texture(textureStone);
           }
           murSud.vertex(0, 20, 0, 0, 0);
           murSud.vertex(20, 20, 0, 1, 0);
@@ -156,10 +157,10 @@ PShape genererShapeNiveau(int niveau) {
           PShape murEst = createShape();
           murEst.beginShape(QUADS);
           if (estExterieur) {
-            murEst.texture(textureStoneJaune);
+            murEst.texture(textureStone);
           } else {
             //murEst.texture(textureStone);
-            murEst.texture(textureStoneJaune);
+            murEst.texture(textureStone);
           }
           murEst.vertex(20, 0, 0, 0, 0);
           murEst.vertex(20, 20, 0, 1, 0);
@@ -175,10 +176,10 @@ PShape genererShapeNiveau(int niveau) {
           PShape murOuest = createShape();
           murOuest.beginShape(QUADS);
           if (estExterieur) {
-            murOuest.texture(textureStoneJaune);
+            murOuest.texture(textureStone);
           } else {
             //murOuest.texture(textureStone);
-            murOuest.texture(textureStoneJaune);
+            murOuest.texture(textureStone);
           }
           murOuest.vertex(0, 0, 0, 0, 0);
           murOuest.vertex(0, 20, 0, 1, 0);
@@ -193,7 +194,7 @@ PShape genererShapeNiveau(int niveau) {
         PShape plafond = createShape();
         plafond.beginShape(QUADS);
         //plafond.texture(textureStone);
-        plafond.texture(textureStoneJaune);
+        plafond.texture(textureStone);
         plafond.vertex(0, 0, 20, 0, 0);
         plafond.vertex(20, 0, 20, 1, 0);
         plafond.vertex(20, 20, 20, 1, 1);
@@ -206,7 +207,7 @@ PShape genererShapeNiveau(int niveau) {
         PShape sol = createShape();
         sol.beginShape(QUADS);
         //sol.texture(textureStone);
-        sol.texture(textureStoneJaune);
+        sol.texture(textureStone);
         sol.vertex(0, 0, 0, 0, 0);
         sol.vertex(20, 0, 0, 1, 0);
         sol.vertex(20, 20, 0, 1, 1);
@@ -221,7 +222,7 @@ PShape genererShapeNiveau(int niveau) {
         solVide.beginShape(QUADS);
         solVide.noStroke();
         //solVide.fill(50, 50, 50);
-        solVide.texture(textureSolPlafondJaune);
+        solVide.texture(textureSolPlafond);
         solVide.vertex(0, 0, 0, 0, 0);
         solVide.vertex(20, 0, 0, 1, 0);
         solVide.vertex(20, 20, 0, 1, 1);
@@ -235,7 +236,7 @@ PShape genererShapeNiveau(int niveau) {
         plafondVide.beginShape(QUADS);
         plafondVide.noStroke();
         //plafondVide.fill(50, 50, 50);
-        plafondVide.texture(textureSolPlafondJaune);
+        plafondVide.texture(textureSolPlafond);
         plafondVide.vertex(0, 0, 20, 0, 0);
         plafondVide.vertex(20, 0, 20, 1, 0);
         plafondVide.vertex(20, 20, 20, 1, 1);

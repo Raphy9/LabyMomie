@@ -21,7 +21,6 @@ boolean estExterieur = false; // Si le joueur est à l'extérieur ou pas.
 boolean[][][] decouvert;
 
 
-
 // Textures
 PImage textureStone;
 PImage texturePorte;
@@ -44,10 +43,7 @@ void setup() {
   randomSeed(2);
   size(1000, 1000, P3D);
 
-  
-
-  
-
+  lanterneModel = createTorch3D();
   surface.setTitle("Des momies et des pyramides !");
   // Chargement des textures
   textureStone = loadImage("stone.jpg");
@@ -57,19 +53,18 @@ void setup() {
   texturePorte = loadImage("porte.png");
   textureSolPlafond = loadImage("textureSolPlafond.png");
   textureSolPlafondJaune = createTextureJaune(textureSolPlafond);
-  texturePorte = createTextureJaune(texturePorte);
-  textureStoneJaune = createTextureJaune(textureStone);
+  textureStoneJaune = textureStone;
   textureSable = loadImage("desert.png");
   
   // Charge la lanterne (ici en format OBJ)
-  lanterneModel = loadShape("lanterne.obj");
+  //lanterneModel = loadShape("lanterne.obj");
   //textureLanterne = loadImage("textureLanterne.jpg");
-  lanterneModel.setFill(color(255, 200, 40));
+  //lanterneModel.setFill(color(255, 200, 40));
 
   textureCiel = loadImage("ciel.png");
 
   textureMode(NORMAL);
-
+ hauteursSol = new float[TAILLE_DESERT][TAILLE_DESERT];
   // Initialisation du shader pour la tempête de sable
   initSandstormShader();
 
@@ -106,8 +101,6 @@ void setup() {
   oldPosY = posY;
   oldPosZ = posZ;
   initMummyPosition();
-  // Génération du sol désertique
-  genererSolDesertique();
 }
 
 void draw() {
@@ -256,22 +249,21 @@ void drawGame() {
 
     // Positionner la lanterne en bas à droite.
     // Ici, on translate vers (width - offsetX, height - offsetY)
-    float offsetX = 500;  // ajuste selon ce qui te convient
-    float offsetY = 500;  // idem
-    translate(width - offsetX, height - offsetY, -900);
+    float offsetX = 700;  // ajuste selon ce qui te convient
+    float offsetY = 700;  // idem
+    translate(width - offsetX+90, height - offsetY+240, -900);
 
     // Optionnel : Ajouter une rotation pour simuler l'angle de vue d'une main
     // Par exemple, tourner légèrement autour de l'axe X et Y
     rotateX(radians(15));
     rotateY(radians(10));
     
-
     // Si besoin, ajuste l'échelle pour qu'elle soit de la bonne taille sur l'écran
-    scale(-20);
-
+    scale(-3);
+    pointLight(251, 139, 35, width - offsetX+90 , height - offsetY+240, 0); 
+    lanterneModel.texture(textureStone);
     // Affiche le modèle 3D de la lanterne
     shape(lanterneModel);
-
     // Réactiver le test de profondeur
     hint(ENABLE_DEPTH_TEST);
     popMatrix();
@@ -358,17 +350,18 @@ void configLights() {
     // Couleur de la lumière (lanterne) : légèrement "chaude"
     // Pour un effet "feu" : vers l'orangé/jaune
     float r = 255;
-    float g = 200;
-    float b = 40;
+    float g = 145;
+    float b = 68;
 
     // Position du joueur en "coordonnées Processing" (x20)
     // + légère hauteur pour que la lumière soit au niveau du regard
     float lx = posX * 20;
     float ly = posY * 20;
     float lz = posZ + hauteur;
+    
 
     // Lumière ponctuelle qui fera office de lanterne
-    ambientLight(r, g, b, lx, ly, lz);
+    ambientLight(r, g, b, lx-8, ly, lz);
   }
 }
 
@@ -406,6 +399,47 @@ boolean estProcheEntreeSortie() {
 
   return false;
 }
+
+PShape creerTorche(PApplet p) {
+  // Crée un groupe de shapes pour contenir la torche complète
+  PShape torche = p.createShape(PShape.GROUP);
+
+  // --- Création du manche de la torche ---
+  PShape manche = p.createShape();
+  manche.beginShape();
+  manche.fill(139, 69, 19); // Couleur brun (valeurs au format RGB)
+  manche.noStroke();
+
+  // Définissez ci-dessous les points de la forme du manche
+  // Dans cet exemple, on crée un manche conique vu de face
+  manche.vertex(-5, 0);
+  manche.vertex(5, 0);
+  manche.vertex(8, -80);
+  manche.vertex(-8, -80);
+
+  manche.endShape(CLOSE);
+
+  // --- Création de la flamme ---
+  PShape flamme = p.createShape();
+  flamme.beginShape();
+  flamme.fill(255, 140, 0); // Couleur orange
+  flamme.noStroke();
+
+  // Exemple de forme de flamme dessinée avec des courbes de Bézier
+  flamme.vertex(0, -80);
+  flamme.bezierVertex(10, -120, 20, -100, 0, -140);
+  flamme.bezierVertex(-20, -100, -10, -120, 0, -80);
+
+  flamme.endShape(CLOSE);
+
+  // Ajout du manche et de la flamme au groupe torche
+  torche.addChild(manche);
+  torche.addChild(flamme);
+
+  // Retourne le PShape complet de la torche
+  return torche;
+}
+
 
 // Fonction d'easing pour un mouvement plus naturel (easeInOutQuad)
 float easeInOutQuad(float t) {

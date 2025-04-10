@@ -172,6 +172,7 @@ void renderSolDesertique(boolean light) {
 
 void gestionRenderSol() {
   if (estExterieur) {
+    genererSolDesertique();
     renderSolDesertique(true);
   } else {
     renderSolDesertique(false);

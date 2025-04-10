@@ -251,8 +251,10 @@ void drawGame() {
     // Ici, on translate vers (width - offsetX, height - offsetY)
     float offsetX = 700;  // ajuste selon ce qui te convient
     float offsetY = 700;  // idem
-    translate(width - offsetX+90, height - offsetY+240, -900);
-
+    if (!estExterieur) {
+      translate(width - offsetX+90, height - offsetY+240, -900);
+    } else {
+    }
     // Optionnel : Ajouter une rotation pour simuler l'angle de vue d'une main
     // Par exemple, tourner légèrement autour de l'axe X et Y
     rotateX(radians(15));

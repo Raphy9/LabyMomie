@@ -1,4 +1,3 @@
-
 /**
  * Crée l'ensemble de la torche sous forme d'un PShape GROUP :
  *  - Manche (profil révolutionné)

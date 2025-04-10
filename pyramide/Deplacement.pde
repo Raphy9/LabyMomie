@@ -55,6 +55,7 @@ void keyReleased() {
     // Arrêter l'interpolation de déplacement :
     isMoving = false;
     animationTimer = 0;
+    deplacerJoueur(targetPosX, targetPosY);
   }
   // Touche flèche haut
   if (keyCode == 38) {
@@ -89,7 +90,7 @@ void rotateLeft() {
   dirY /= longueur;
 
   animMode = 2;
-  anim = 1;
+  anim = 0;
 }
 
 // Rotation à droite
@@ -107,20 +108,20 @@ void rotateRight() {
   dirY /= longueur;
 
   animMode = 2;
-  anim = 1;
+  anim = 0;
 }
 
 void moveForward() {
   if (anim > 0) return;
-  float newPosX = posX + dirX * 0.75;
-  float newPosY = posY + dirY * 0.75;
+  float newPosX = posX + dirX * 0.6;
+  float newPosY = posY + dirY * 0.6;
   deplacerJoueur(newPosX, newPosY);
 }
 
 void moveBackward() {
   if (anim > 0) return;
-  float newPosX = posX - dirX * 0.75;
-  float newPosY = posY - dirY * 0.75;
+  float newPosX = posX - dirX * 0.6;
+  float newPosY = posY - dirY * 0.6;
   deplacerJoueur(newPosX, newPosY);
 }
 

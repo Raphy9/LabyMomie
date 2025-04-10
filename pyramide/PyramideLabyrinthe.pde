@@ -32,12 +32,22 @@ PImage textureCiel;
 PImage textureSolPlafond;
 PImage textureSolPlafondJaune;
 
+PShape lanterneModel;
+
+PImage textureLanterne;
+
+
 float time = 0;
 
 void setup() {
   frameRate(20);
   randomSeed(2);
   size(1000, 1000, P3D);
+
+  
+
+  
+
   surface.setTitle("Des momies et des pyramides !");
   // Chargement des textures
   textureStone = loadImage("stone.jpg");
@@ -50,6 +60,11 @@ void setup() {
   texturePorte = createTextureJaune(texturePorte);
   textureStoneJaune = createTextureJaune(textureStone);
   textureSable = loadImage("desert.png");
+  
+  // Charge la lanterne (ici en format OBJ)
+  lanterneModel = loadShape("lanterne.obj");
+  //textureLanterne = loadImage("textureLanterne.jpg");
+  lanterneModel.setFill(color(255, 200, 40));
 
   textureCiel = loadImage("ciel.png");
 
@@ -229,6 +244,40 @@ void drawGame() {
   if (estExterieur) {
     applySandstormEffect();
   }
+  
+  // Afficher la lanterne uniquement si le joueur est à l'intérieur du labyrinthe.
+  if (!estExterieur) {
+    pushMatrix();
+    // Réinitialiser la matrice pour passer en coordonnées écran
+    resetMatrix();
+    lights();
+    // Désactiver le test de profondeur pour que la lanterne ne soit pas cachée
+    hint(DISABLE_DEPTH_TEST);
+
+    // Positionner la lanterne en bas à droite.
+    // Ici, on translate vers (width - offsetX, height - offsetY)
+    float offsetX = 500;  // ajuste selon ce qui te convient
+    float offsetY = 500;  // idem
+    translate(width - offsetX, height - offsetY, -900);
+
+    // Optionnel : Ajouter une rotation pour simuler l'angle de vue d'une main
+    // Par exemple, tourner légèrement autour de l'axe X et Y
+    rotateX(radians(15));
+    rotateY(radians(10));
+    
+
+    // Si besoin, ajuste l'échelle pour qu'elle soit de la bonne taille sur l'écran
+    scale(-20);
+
+    // Affiche le modèle 3D de la lanterne
+    shape(lanterneModel);
+
+    // Réactiver le test de profondeur
+    hint(ENABLE_DEPTH_TEST);
+    popMatrix();
+  }
+
+
   noLights(); // sinon les lumières vont affecter la minimap.
   drawMiniMap();
 }

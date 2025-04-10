@@ -89,7 +89,7 @@ void rotateLeft() {
   dirY /= longueur;
 
   animMode = 2;
-  anim = 2;
+  anim = 1;
 }
 
 // Rotation à droite
@@ -107,20 +107,20 @@ void rotateRight() {
   dirY /= longueur;
 
   animMode = 2;
-  anim = 2;
+  anim = 1;
 }
 
 void moveForward() {
   if (anim > 0) return;
-  float newPosX = posX + dirX * 0.6;
-  float newPosY = posY + dirY * 0.6;
+  float newPosX = posX + dirX * 0.75;
+  float newPosY = posY + dirY * 0.75;
   deplacerJoueur(newPosX, newPosY);
 }
 
 void moveBackward() {
   if (anim > 0) return;
-  float newPosX = posX - dirX * 0.6;
-  float newPosY = posY - dirY * 0.6;
+  float newPosX = posX - dirX * 0.75;
+  float newPosY = posY - dirY * 0.75;
   deplacerJoueur(newPosX, newPosY);
 }
 

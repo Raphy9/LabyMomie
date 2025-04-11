@@ -56,11 +56,6 @@ void setup() {
   textureStoneJaune = textureStone;
   textureSable = loadImage("desert.png");
   
-  // Charge la lanterne (ici en format OBJ)
-  //lanterneModel = loadShape("lanterne.obj");
-  //textureLanterne = loadImage("textureLanterne.jpg");
-  //lanterneModel.setFill(color(255, 200, 40));
-
   textureCiel = loadImage("ciel.png");
 
   textureMode(NORMAL);
@@ -272,8 +267,11 @@ void drawGame() {
   }
   noLights();
   drawCompass();
-  noLights(); // sinon les lumières vont affecter la minimap.
-  drawMiniMap();
+  
+  if(!estExterieur) {
+    noLights(); // sinon les lumières vont affecter la minimap.
+    drawMiniMap();
+  }
 }
 
 // Fonction pour vérifier si le joueur entre en collision avec la momie
@@ -326,7 +324,7 @@ void renderPyramide() {
   renderPyramideLisseExterieure(220, 18, 17, true);
   popMatrix();
 
-  // 3e pyramide
+  // 3e pyramide (à droite)
   pushMatrix();
   translate(-420, +229, -50);
   renderPyramideLisseExterieure(240, 16, 20, true);

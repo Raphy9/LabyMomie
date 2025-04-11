@@ -1,29 +1,25 @@
-// --- Variables Globales pour la rotation fluide ---
-float currentAngle;   // Angle actuel (en radians)
-float targetAngle= PI/2;    // Angle visé
-float rotationStep = PI / 30;  // Incrément de rotation par frame (ici 1° par appel)
+float currentAngle;   // En radians
+float targetAngle= PI/2;
+float rotationStep = PI / 30; // Incrément de rotation par frame (ici 1° par appel)
 
-// Variables de déplacement déjà existantes
 boolean isKeyUpPressed = false;
 boolean isKeyDownPressed = false;
 boolean isKeyLeftPressed = false;
 boolean isKeyRightPressed = false;
 
-// --- Gestion des déplacements ---
 void gestionDeplacements() {
-  // Si la touche "flèche gauche" est maintenue
   if (isKeyLeftPressed) {
     rotateLeft();
   }
-  // Si la touche "flèche droite" est maintenue
+  
   if (isKeyRightPressed) {
     rotateRight();
   }
-  // Si la touche "flèche haut" est maintenue
+  
   if (isKeyUpPressed) {
     moveForward();
   }
-  // Si la touche "flèche bas" est maintenue
+  
   if (isKeyDownPressed) {
     moveBackward();
   }
@@ -32,33 +28,28 @@ void gestionDeplacements() {
   }
 }
 
-// --- Fonction d'interpolation de la rotation ---
-// Cette fonction doit être appelée à chaque frame (dans draw())
 void updateRotationAnimation() {
-  // Facteur de lissage (plus il est faible, plus la rotation sera progressive)
+  // Facteur de lissage
   float smoothing = 0.2;
   float diff = targetAngle - currentAngle;
   
-  // Normaliser la différence pour éviter de tourner dans le mauvais sens (entre -PI et PI)
+  // On normalise la différence pour éviter de tourner dans le mauvais sens (entre -PI et PI)
   if(diff > PI) {
     diff -= 2 * PI;
   } else if(diff < -PI) {
     diff += 2 * PI;
   }
   
-  // Si la différence est très faible, on "snap" directement à targetAngle
   if (abs(diff) < 0.001) {
     currentAngle = targetAngle;
   } else {
     currentAngle += diff * smoothing;
   }
   
-  // Mettre à jour le vecteur direction
   dirX = cos(currentAngle);
   dirY = sin(currentAngle);
 }
 
-// --- Révélation de la zone autour du joueur (inchangée) ---
 void revelerZoneAutourDuJoueur() {
   int px = int(posX - DECALAGES[niveauActuel]);
   int py = int(posY - DECALAGES[niveauActuel]);
@@ -78,7 +69,6 @@ void revelerZoneAutourDuJoueur() {
   }
 }
 
-// --- KeyReleased (inchangé pour les déplacements) ---
 void keyReleased() {
   // Pour les touches directionnelles
   if (keyCode == 37) {
@@ -93,18 +83,14 @@ void keyReleased() {
   else if (keyCode == 40) {
     isKeyDownPressed = false;
   }
-  // Autres actions à la relâche
   if (keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 37) {
-    // Par exemple, arrêter l'interpolation de déplacement si besoin
     isMoving = false;
     animationTimer = 0;
     deplacerJoueur(targetPosX, targetPosY);
   }
 }
 
-// --- Fonctions de rotation modifiées pour animation fluide ---
 void rotateLeft() {
-  // Plutôt que d'effectuer la rotation immédiatement, on ajoute une petite rotation à la cible
   targetAngle -= rotationStep;
 }
 
@@ -112,7 +98,6 @@ void rotateRight() {
   targetAngle += rotationStep;
 }
 
-// --- Fonctions de déplacement en avant/arrière (inchangées) ---
 void moveForward() {
   if (anim > 0) return;
   float newPosX = posX + dirX * 0.6;
@@ -127,7 +112,6 @@ void moveBackward() {
   deplacerJoueur(newPosX, newPosY);
 }
 
-// --- Déplacement du joueur (inchangé) ---
 void deplacerJoueur(float newPosX, float newPosY) {
   oldPosX = posX;
   oldPosY = posY;
@@ -136,6 +120,11 @@ void deplacerJoueur(float newPosX, float newPosY) {
   float newPosZ = posZ;
 
   if (estExterieur) {
+    // Vérifier si le joueur tente de traverser une pyramide extérieure
+    if (collisionAvecPyramideExterieure(newPosX, newPosY, newPosZ)) {
+      return; // Le déplacement est bloqué par une pyramide extérieure
+    }
+    
     targetPosX = newPosX;
     targetPosY = newPosY;
     targetPosZ = newPosZ;
@@ -176,6 +165,11 @@ void deplacerJoueur(float newPosX, float newPosY) {
         return;  // La case ciblée est un mur
       }
     } else {
+      // Le joueur sort du labyrinthe, vérifier s'il tente de traverser une pyramide
+      if (collisionAvecPyramideExterieure(newPosX, newPosY, newPosZ)) {
+        return; // Le déplacement est bloqué par une pyramide extérieure
+      }
+      
       targetPosX = newPosX;
       targetPosY = newPosY;
       targetPosZ = newPosZ;
@@ -186,7 +180,92 @@ void deplacerJoueur(float newPosX, float newPosY) {
   isMoving = true;
 }
 
-// --- Gestion des touches (inchangée pour la plupart) ---
+
+boolean estDansPyramide(float x, float y, float z, float baseX, float baseY, float baseSize, float hauteurSommet, float marge) {
+  // On commence par convertir les coordonnées du joueur en coordonnées relatives à la base de la pyramide
+  float relX = x * 20 - baseX;
+  float relY = y * 20 - baseY;
+  float relZ = z;
+  
+  // On vérifie ici si le point est à l'intérieur de la base carrée de la pyramide (en prenant en compte la marge)
+  if (relX < -marge || relX > baseSize + marge || relY < -marge || relY > baseSize + marge) {
+    return false;
+  }
+  
+  float centreX = baseSize / 2;
+  float centreY = baseSize / 2;
+  
+  // Calcul de la distance par rapport au centre
+  float distX = abs(relX - centreX) / (centreX + marge/2);
+  float distY = abs(relY - centreY) / (centreY + marge/2);
+  
+  float distMax = max(distX, distY);
+  
+  // On détermine la hauteur de la pyramide à ce point
+  // Quand distMax = 0 (au centre) alors hauteur = hauteurSommet
+  // Quand distMax = 1 (au bord) alors hauteur = 0
+  float hauteurPoint = hauteurSommet * (1 - distMax);
+  
+  // On ajoute une marge de sécurité pour la hauteur
+  hauteurPoint += 5.0;
+  
+  // Le point est dans la pyramide si sa hauteur est inférieure à la hauteur de la pyramide à ce point
+  return relZ < hauteurPoint;
+}
+
+// Fonction pour vérifier si le joueur est en collision avec une pyramide extérieure
+boolean collisionAvecPyramideExterieure(float newPosX, float newPosY, float newPosZ) {
+  
+  // --- Paramètres pour la pyramide principale ---
+  float baseX = 0;
+  float baseY = 0;
+  float baseSize = 21 * 20; // Rappel : nbCases * nbUnites
+  float hauteurSommet = 300;
+  float margePrincipale = 15.0;
+  
+  if (estDansPyramide(newPosX, newPosY, newPosZ, baseX, baseY, baseSize, hauteurSommet, margePrincipale)) {
+    // Vérifier si le joueur est près d'une entrée
+    // Entrée avant (on inclus une certaine marge pour plus de sécurité).
+    if (newPosX * 20 >= 20 - margePrincipale && newPosX * 20 <= 40 + margePrincipale && 
+        newPosY * 20 <= 0 + margePrincipale && newPosY * 20 >= -15 - margePrincipale) {
+      return false; // Pas de collision, c'est une entrée.
+    }
+    
+    // Entrée droite
+    if (newPosX * 20 >= baseSize - margePrincipale && newPosX * 20 <= baseSize + 15 + margePrincipale && 
+        newPosY * 20 >= baseSize - 40 - margePrincipale && newPosY * 20 <= baseSize - 20 + margePrincipale) {
+      return false;
+    }
+    
+    return true; // Collision !
+  }
+  
+  // --- Paramètres de la deuxième pyramide (à gauche) ---
+  baseX = 550;
+  baseY = -229;
+  baseSize = 18 * 17;
+  hauteurSommet = 220;
+  float margeGauche = 15.0;
+  
+  // Vérifier si le joueur est à l'intérieur de la deuxième pyramide qui n'a pas d'entrée
+  if (estDansPyramide(newPosX, newPosY, newPosZ, baseX, baseY, baseSize, hauteurSommet, margeGauche)) {
+    return true;
+  }
+  
+  // --- Paramètres de la troisième pyramide (à droite) ---
+  baseX = -420;
+  baseY = 229;
+  baseSize = 16 * 20;
+  hauteurSommet = 240;
+  float margeDroite = 1.0;
+  
+  if (estDansPyramide(newPosX, newPosY, newPosZ, baseX, baseY, baseSize, hauteurSommet, margeDroite)) {
+    return true;
+  }
+  
+  return false;
+}
+
 void keyPressed() {
   if (anim > 0) return;
 

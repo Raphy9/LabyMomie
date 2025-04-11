@@ -7,16 +7,16 @@ void drawMiniMap() {
   // Propriétés de la minimap.
   int mapSize = 200;
   int mapX = 20;
-  int mapY = 20;
+  int mapY = 40;
   int cellSize = mapSize / LAB_SIZES[niveauActuel];
   
   // Background de la mini-carte
   fill(0, 0, 0, 150);
-  rect(mapX-5, mapY-5, mapSize+10, mapSize+10);
+  rect(mapX-10, mapY-10, mapSize+10, mapSize+10);
   
   // Afficher le niveau actuel
   fill(255);
-  text("Niveau: " + niveauActuel, mapX+43, mapY-10);
+  text("Niveau: " + niveauActuel, mapX+43, mapY-25);
   
 for (int j = 0; j < LAB_SIZES[niveauActuel]; j++) {
   for (int i = 0; i < LAB_SIZES[niveauActuel]; i++) {

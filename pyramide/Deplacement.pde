@@ -1,7 +1,7 @@
 // --- Variables Globales pour la rotation fluide ---
 float currentAngle;   // Angle actuel (en radians)
-float targetAngle;    // Angle visé
-float rotationStep = PI / 45;  // Incrément de rotation par frame (ici 1° par appel)
+float targetAngle= PI/2;    // Angle visé
+float rotationStep = PI / 30;  // Incrément de rotation par frame (ici 1° par appel)
 
 // Variables de déplacement déjà existantes
 boolean isKeyUpPressed = false;
@@ -36,7 +36,7 @@ void gestionDeplacements() {
 // Cette fonction doit être appelée à chaque frame (dans draw())
 void updateRotationAnimation() {
   // Facteur de lissage (plus il est faible, plus la rotation sera progressive)
-  float smoothing = 0.4;
+  float smoothing = 0.2;
   float diff = targetAngle - currentAngle;
   
   // Normaliser la différence pour éviter de tourner dans le mauvais sens (entre -PI et PI)
@@ -229,35 +229,4 @@ void keyPressed() {
       NIVEAUACTUEL--;
     }
   }
-}
-
-PVector adjustCameraCollision(PVector playerPos, PVector desiredCam) {
-  // La direction de la caméra depuis le joueur
-  PVector dir = PVector.sub(desiredCam, playerPos);
-  float maxDist = dir.mag();
-  dir.normalize();
-  
-  // On parcourt la ligne de playerPos à desiredCam par petits pas
-  float step = 1.0;
-  float safeDist = maxDist; // par défaut, aucun mur rencontré
-  for (float d = 0; d <= maxDist; d += step) {
-    PVector sample = PVector.add(playerPos, PVector.mult(dir, d));
-    // Conversion des coordonnées sample en coordonnées de la grille
-    int gridX = int(sample.x / 20.0 - DECALAGES[niveauActuel]);
-    int gridY = int(sample.y / 20.0 - DECALAGES[niveauActuel]);
-    
-    if (gridX >= 0 && gridX < LAB_SIZES[niveauActuel] &&
-        gridY >= 0 && gridY < LAB_SIZES[niveauActuel]) {
-      if (labyrinthes[niveauActuel][gridY][gridX] == '#') {
-        // Collision détectée : on positionne la distance safe juste avant le mur,
-        // en retirant par exemple 2 unités comme marge.
-        safeDist = max(0, d - 2);
-        break;
-      }
-    }
-  }
-  
-  // Position safe de la caméra : à partir du joueur, avancer safeDist le long de la direction.
-  PVector safeCam = PVector.add(playerPos, PVector.mult(dir, safeDist));
-  return safeCam;
 }

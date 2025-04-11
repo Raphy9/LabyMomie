@@ -207,6 +207,7 @@ void drawGame() {
   if (anim > 0) {
     anim--;
   }
+  
 
   gestionDeplacements();
   updateRotationAnimation();
@@ -249,12 +250,10 @@ void drawGame() {
     hint(DISABLE_DEPTH_TEST);
 
     // Positionner la lanterne en bas à droite.
-    // Ici, on translate vers (width - offsetX, height - offsetY)
     float offsetX = 700;  // ajuste selon ce qui te convient
     float offsetY = 700;  // idem
     if (!estExterieur) {
       translate(width - offsetX+90, height - offsetY+240, -900);
-    } else {
     }
     // Optionnel : Ajouter une rotation pour simuler l'angle de vue d'une main
     // Par exemple, tourner légèrement autour de l'axe X et Y
@@ -271,8 +270,8 @@ void drawGame() {
     hint(ENABLE_DEPTH_TEST);
     popMatrix();
   }
-
-
+  noLights();
+  drawCompass();
   noLights(); // sinon les lumières vont affecter la minimap.
   drawMiniMap();
 }

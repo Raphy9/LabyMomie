@@ -16,7 +16,7 @@ void drawMiniMap() {
   
   // Afficher le niveau actuel
   fill(255);
-  text("Niveau: " + niveauActuel, mapX, mapY-10);
+  text("Niveau: " + niveauActuel, mapX+43, mapY-10);
   
 for (int j = 0; j < LAB_SIZES[niveauActuel]; j++) {
   for (int i = 0; i < LAB_SIZES[niveauActuel]; i++) {

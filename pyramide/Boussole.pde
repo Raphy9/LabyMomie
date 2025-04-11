@@ -1,4 +1,3 @@
-float angleNorth = 0;
 float compassRadius = 150;
 float compassThickness = 40;
 
@@ -15,6 +14,7 @@ void drawCompass() {
   drawCompassBody(compassRadius, compassThickness);
   pushMatrix();
     translate(0, 0, -compassThickness/2.0);
+    // Le cadre de la boussole reste fixe
     drawCompassFace(compassRadius);
   popMatrix();
   hint(ENABLE_DEPTH_TEST);
@@ -83,28 +83,24 @@ void drawCompassFace(float radius) {
       fill(0);
       float textRadius = radius * 0.7;
       
-      // Texte "N"
       pushMatrix();
         translate(0, -textRadius);
         rotateX(PI);
         text("N", 0, 0);
       popMatrix();
-      
-      // Texte "E"
+
       pushMatrix();
         translate(textRadius, 0);
         rotateY(PI);
         text("E", 0, 0);
       popMatrix();
-      
-      // Texte "S"
+
       pushMatrix();
         translate(0, textRadius);
-               rotateY(PI);
+        rotateY(PI);
         text("S", 0, 0);
       popMatrix();
-      
-      // Texte "O"
+
       pushMatrix();
         translate(-textRadius, 0);
         rotateY(PI);
@@ -112,13 +108,20 @@ void drawCompassFace(float radius) {
       popMatrix();
     popMatrix();
     
-    // --- Aiguille Nord rouge
-    drawNeedle(radius * 0.52, 8, color(200, 0, 0));
-    
-    // Aiguille Sud (bleue)
+    // Rotation des aiguilles en fonction de l'orientation du joueur
     pushMatrix();
-      rotate(PI);
-      drawNeedle(radius * 0.52, 8, color(0, 0, 200));
+      // Remarque : les aiguilles doivent tourner dans le sens inverse du joueur pour indiquer le nord correctement
+      float angleNorth = -currentAngle;
+      rotate(angleNorth);
+      
+      // Aiguille Nord (rouge)
+      drawNeedle(radius * 0.52, 8, color(200, 0, 0));
+      
+      // Aiguille Sud (bleue)
+      pushMatrix();
+        rotate(PI);
+        drawNeedle(radius * 0.52, 8, color(0, 0, 200));
+      popMatrix();
     popMatrix();
 
   popMatrix();

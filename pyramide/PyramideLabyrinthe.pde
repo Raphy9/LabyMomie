@@ -8,9 +8,9 @@ float oldDirX, oldDirY;
 float oldPosX, oldPosY, oldPosZ;
 float targetPosX, targetPosY, targetPosZ;  // Position cible à atteindre
 
-// Variables d’animation
+// Variables d'animation
 float animationTimer = 0;                // Timer qui suit l’avancement de l’animation
-float animationDuration = 0.2;           // Durée de l’animation (en secondes) – à ajuster selon ton goût
+float animationDuration = 0.2;           // Durée de l'animation (en secondes) – à ajuster selon ton goût
 boolean isMoving = false;                // True si le joueur est en train de se déplacer
 
 float hauteur = 10; // Hauteur caméra
@@ -209,6 +209,7 @@ void drawGame() {
   }
 
   gestionDeplacements();
+  updateRotationAnimation();
 
   updateMummy();
 

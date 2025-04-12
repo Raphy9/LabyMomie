@@ -26,7 +26,6 @@ void drawMenu() {
   pushMatrix();
   renderCiel();
   
-  
   translate(width/2, height/2, 0);
   camAngle += 0.01;
   rotateY(PI);
@@ -68,7 +67,8 @@ void drawMenu() {
   translate(0,300,0);
   rotateX(PI/2);
   scale(5);
-  gestionRenderSol();
+  genererSolDesertique();
+  renderSolDesertique(false);
   popMatrix();
  
   

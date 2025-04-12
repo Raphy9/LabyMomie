@@ -1,6 +1,5 @@
 float[][] hauteursSol;
-// Le terrain  l'extérieur
-int TAILLE_DESERT = 150;
+int TAILLE_DESERT = 350;
 
 // Shader pour simuler les grains de sable volant dans le vent
 PShader sandstormShader;
@@ -42,7 +41,6 @@ void initSandstormShader() {
   sandstormShader.set("windStrength", 1.5); // Force du vent (augmentée)
 }
 
-// Fonction pour mettre à jour les paramètres du shader de tempête de sable
 void updateSandstormShader() {
   // Mise à jour du temps pour l'animation
   sandstormShader.set("time", time);
@@ -73,37 +71,32 @@ void genererSolDesertique() {
   for (int i = 0; i < TAILLE_DESERT; i++) {
     for (int j = 0; j < TAILLE_DESERT; j++) {
       // On utilise ici du 'bruit' pour moduler la hauteur
-      hauteursSol[i][j] = map(noise(i/14.0, j/14.0), 0, 1, -8, 8);
+      hauteursSol[i][j] = map(noise(i/40.0, j/40.0), 0, 1, -26, 26);
     }
   }
 }
 
 void renderCiel() {
   pushMatrix();
-  
-  // Désactiver la profondeur pour dessiner en arrière-plan
+
   hint(DISABLE_DEPTH_TEST);
-  
-  // Désactiver l'éclairage
+
   noLights();
-  
-  // S'assurer qu'aucune teinte n'est appliquée
+
   noTint();
   
   float skySize = 2000;
-  int detail = 24; // Niveau de détail de la sphère
+  int detail = 24;
   
-  // Utiliser le mode de texture NORMAL
   textureMode(NORMAL);
   
-  // Désactiver les contours
   noStroke();
   
-  // Dessiner la sphère manuellement avec des triangles
+  // On dessine la sphère 'manuellement'
   beginShape(TRIANGLES);
   texture(textureCiel);
   
-  // Générer les sommets de la sphère avec les coordonnées UV appropriées
+  // On génère les sommets de la sphère avec les coordonnées UV appropriées
   for (int i = 0; i < detail; i++) {
     float lat1 = map(i, 0, detail, 0, PI);
     float lat2 = map(i + 1, 0, detail, 0, PI);
@@ -132,18 +125,14 @@ void renderCiel() {
   
   endShape();
   
-  // Réactiver la profondeur
   hint(ENABLE_DEPTH_TEST);
   
   popMatrix();
 }
 
-// Fonction pour appliquer l'effet de tempête de sable
 void applySandstormEffect() {
-  // Mettre à jour les paramètres du shader
   updateSandstormShader();
   
-  // Appliquer le shader comme filtre post-traitement
   filter(sandstormShader);
 }
 
@@ -152,7 +141,7 @@ void renderSolDesertique(boolean light) {
   // Positionner le sol en dessous de la pyramide
   translate(-TAILLE_DESERT*10, -TAILLE_DESERT*10, -5);
   if( light ){
-    directionalLight(240, 175, 44, 0.5, 0.5, -1);
+    directionalLight(244, 164, 96, 1.5, 0.5, -1);
   }
   // Dessiner la grille de quads avec hauteur modulée (pour obtenir un effet un peu vague)
   for (int i = 0; i < TAILLE_DESERT-1; i++) {
@@ -174,8 +163,6 @@ void gestionRenderSol() {
   if (estExterieur) {
     genererSolDesertique();
     renderSolDesertique(true);
-  } else {
-    renderSolDesertique(false);
   }
 }
 

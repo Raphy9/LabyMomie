@@ -1,3 +1,11 @@
+import processing.sound.*;
+
+SoundFile ambiantExterieur;
+SoundFile ambiantInterieur;
+SoundFile reveal;
+
+int revealDistance = 20;
+
 ArrayList<PShape> niveauxShapes = new ArrayList<PShape>();
 int NIVEAUACTUEL =0;
 
@@ -37,6 +45,15 @@ PShape lanterneModel;
 float time = 0;
 
 void setup() {
+  
+  // Charger les fichiers audio depuis le dossier data
+  ambiantExterieur = new SoundFile(this, "ambiant_exterieur.mp3");
+  ambiantInterieur = new SoundFile(this, "ambiant_interieur.mp3");
+  reveal = new SoundFile(this, "reveal.mp3");
+
+  // Démarre l'ambiance extérieure par défaut en boucle
+  ambiantExterieur.loop();
+  
   frameRate(20);
   randomSeed(2);
   size(1000, 1000, P3D);
@@ -113,6 +130,26 @@ void draw() {
 }
 
 void drawGame() {
+  if (!estExterieur) {
+    // Si on est à l'intérieur et que le son extérieur joue, on l'arrête
+    if (ambiantExterieur.isPlaying()) {
+      ambiantExterieur.stop();
+    }
+    // Démarrer l'ambiance intérieure si elle n'est pas déjà en lecture
+    if (!ambiantInterieur.isPlaying()) {
+      ambiantInterieur.loop();
+    }
+  } else {
+    // Si on est à l'extérieur, on s'assure d'arrêter l'ambiance intérieure
+    if (ambiantInterieur.isPlaying()) {
+      ambiantInterieur.stop();
+    }
+    // Et on démarre l'ambiance extérieure si elle n'est pas déjà en lecture
+    if (!ambiantExterieur.isPlaying()) {
+      ambiantExterieur.loop();
+    }
+  }
+  
   float camX, camY, camZ, lookX, lookY, lookZ;
 
   // On calcule le delta temps approximatif en fonction du frameRate courant

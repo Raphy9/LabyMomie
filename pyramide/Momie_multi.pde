@@ -309,6 +309,17 @@ void checkMummyCollisionAt(int niveau) {
   float dz = posZ - HAUTEURS_NIVEAUX[niveau];
   float distance = sqrt(dx*dx + dy*dy + dz*dz);
   
+  if (distance < revealDistance) {
+    if (!estExterieur) {
+      if (reveal.isPlaying()) {
+        reveal.stop();
+      }
+      if (!reveal.isPlaying()) {
+        reveal.loop();
+      }
+    } 
+  }
+  
   if (distance < collisionDistance) {
     currentState = 0;
     posX = 1.4;

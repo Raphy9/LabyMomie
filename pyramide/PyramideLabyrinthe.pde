@@ -9,7 +9,7 @@ float oldPosX, oldPosY, oldPosZ;
 float targetPosX, targetPosY, targetPosZ;  // Position cible à atteindre
 
 // Variables d'animation
-float animationTimer = 0;                // Timer qui suit l’avancement de l’animation
+float animationTimer = 0;                // Timer qui suit l'avancement de l'animation
 float animationDuration = 0.2;           // Durée de l'animation (en secondes) – à ajuster selon ton goût
 boolean isMoving = false;                // True si le joueur est en train de se déplacer
 float collisionDistance = 8;             // Seuil de collision avec la momie
@@ -93,7 +93,9 @@ void setup() {
   oldPosX = posX;
   oldPosY = posY;
   oldPosZ = posZ;
-  initMummyPosition();
+  
+  // Initialisation des momies pour chaque niveau
+  initMomies();
 }
 
 void draw() {
@@ -194,9 +196,11 @@ void drawGame() {
   gestionDeplacements();
   updateRotationAnimation();
 
-  updateMummy();
+  // Mise à jour de toutes les momies
+  updateAllMummies();
 
-  checkMummyCollision();
+  // Vérification des collisions avec les momies
+  checkAllMummiesCollision();
 
   perspective(PI/3.0, float(width)/float(height), 1, 1000);
 
@@ -212,7 +216,7 @@ void drawGame() {
 
   renderPyramide();
 
-  renderMummy();
+  renderAllMummies();
 
   noTint();
 
@@ -252,24 +256,6 @@ void drawGame() {
   if(!estExterieur) {
     noLights();
     drawMiniMap();
-  }
-}
-
-void checkMummyCollision() {
-  // Calcul de la distance entre le joueur et la momie en prenant en compte l'échelle utilisée (ici, multiplication par 20)
-  float dx = posX*20 - mummyPos.x;
-  float dy = posY*20 - mummyPos.y;
-  float dz = posZ - mummyPos.z;
-  float distance = sqrt(dx*dx + dy*dy + dz*dz);
-
-  if (distance < collisionDistance) {
-    currentState = 0;
-    posX = 1.4;
-    posY = 1.0;
-    posZ = HAUTEURS_NIVEAUX[0];
-    dirX = 0;
-    dirY = 1;
-    initBrouillardMiniMap();
   }
 }
 

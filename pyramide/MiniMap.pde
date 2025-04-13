@@ -26,7 +26,7 @@ for (int j = 0; j < LAB_SIZES[niveauActuel]; j++) {
       (i == 0 || i == LAB_SIZES[niveauActuel] - 1
        || j == 0 || j == LAB_SIZES[niveauActuel] - 1);
     
-    // 2) Si bordure, on l’affiche quoi qu’il arrive :
+    // 2) Si bordure, on l'affiche quoi qu'il arrive :
     if (isBordure) {
       if (labyrinthes[niveauActuel][j][i] == '#') {
         fill(100, 100, 100); // mur
@@ -44,14 +44,14 @@ for (int j = 0; j < LAB_SIZES[niveauActuel]; j++) {
       continue; // on passe à la prochaine cellule
     }
     
-    // 3) Si on est **à l’intérieur**, on dessine seulement si c’est découvert :
+    // 3) Si on est **à l'intérieur**, on dessine seulement si c'est découvert :
     if (!decouvert[niveauActuel][j][i]) {
       fill(0); // non exploré => noir
       rect(mapX + i*cellSize, mapY + j*cellSize, cellSize, cellSize);
       continue;
     }
     
-    // 4) Cellule intérieure + découverte => on l’affiche normalement
+    // 4) Cellule intérieure + découverte => on l'affiche normalement
     if (labyrinthes[niveauActuel][j][i] == '#') {
       fill(100, 100, 100); // mur
       rect(mapX + i*cellSize, mapY + j*cellSize, cellSize, cellSize);
@@ -78,17 +78,8 @@ for (int j = 0; j < LAB_SIZES[niveauActuel]; j++) {
        mapX + (posX-DECALAGES[niveauActuel] + dirX)*cellSize, mapY + (posY-DECALAGES[niveauActuel] + dirY)*cellSize);
   noStroke();
   
- // On dessine ici la position de la momie (en violet)
-  if (mummyNiveau == niveauActuel) {
-    fill(255, 0, 255); // Couleur violette pour la momie
-    ellipse(mapX + (mummyPosX-DECALAGES[mummyNiveau])*cellSize, mapY + (mummyPosY-DECALAGES[mummyNiveau])*cellSize, cellSize*1.2, cellSize*1.2);
-    
-    // On dessine la direction de la momie
-    stroke(255, 165, 0); // Orange pour la direction de la momie
-    line(mapX + (mummyPosX-DECALAGES[mummyNiveau])*cellSize, mapY + (mummyPosY-DECALAGES[mummyNiveau])*cellSize, 
-         mapX + (mummyPosX-DECALAGES[mummyNiveau] + mummyDirX)*cellSize, mapY + (mummyPosY-DECALAGES[mummyNiveau] + mummyDirY)*cellSize);
-    noStroke();
-  }
+  // On dessine la momie du niveau actuel sur la minimap
+  drawAllMummiesOnMiniMap(mapX, mapY, cellSize);
   
   hint(ENABLE_DEPTH_TEST);
 }

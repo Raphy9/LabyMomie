@@ -1,5 +1,3 @@
-// Implémentation des escaliers entre les niveaux de la pyramide
-
 // Fonction pour gérer la montée/descente des escaliers
 void gererEscaliers() {
   // Vérifier si le joueur est sur un escalier montant
@@ -18,6 +16,7 @@ void gererEscaliers() {
       
       fill(255);
       textSize(16);
+      noLights();
       text("Appuyez sur 'E' pour monter", width/2 - 100, height - 50);
       
       hint(ENABLE_DEPTH_TEST);
@@ -31,6 +30,7 @@ void gererEscaliers() {
       
       fill(255);
       textSize(16);
+      noLights();
       text("Appuyez sur 'D' pour descendre", width/2 - 100, height - 50);
       
       hint(ENABLE_DEPTH_TEST);

@@ -1,4 +1,4 @@
-// Structure pour stocker les informations d'une momie
+// Structure pour stocker les informations d'une momie fantôme
 class Momie {
   float posX;      // Position X dans le labyrinthe
   float posY;      // Position Y dans le labyrinthe
@@ -17,10 +17,9 @@ class Momie {
   }
 }
 
-// Tableau pour stocker les momies (une par niveau)
 Momie[] momies;
 
-// Initialisation des momies (une par niveau)
+// Initialisation des momies fantômes (une par niveau)
 void initMomies() {
   momies = new Momie[NIVEAUX];
   
@@ -61,8 +60,6 @@ void initMomies() {
     }
   }
   
-  // Pour maintenir la compatibilité avec le code existant, on initialise aussi les variables globales
-  // pour la momie du niveau 0 (rez-de-chaussée)
   if (momies[0] != null) {
     mummyPosX = momies[0].posX;
     mummyPosY = momies[0].posY;
@@ -73,8 +70,7 @@ void initMomies() {
   }
 }
 
-// Mise à jour de toutes les momies
-void updateAllMummies() {
+void updateAllPhantomMummies() {
   // Mettre à jour chaque momie
   for (int i = 0; i < NIVEAUX; i++) {
     if (momies[i] != null) {
@@ -82,8 +78,6 @@ void updateAllMummies() {
     }
   }
   
-  // Pour maintenir la compatibilité avec le code existant, on met à jour aussi les variables globales
-  // pour la momie du niveau 0 (rez-de-chaussée)
   if (momies[0] != null) {
     mummyPosX = momies[0].posX;
     mummyPosY = momies[0].posY;
@@ -92,6 +86,72 @@ void updateAllMummies() {
     mummyPos.set(mummyPosX * 20, mummyPosY * 20, HAUTEURS_NIVEAUX[mummyNiveau]);
   }
 }
+
+// Rendu de toutes les momies
+void renderAllMummies() {
+  // Sauvegarder l'état actuel de la matrice
+  pushMatrix();
+  rotateX(-PI/2);
+  
+  // Rendre chaque momie
+  for (int i = 0; i < NIVEAUX; i++) {
+    if (momies[i] != null) {
+      renderMummyAt(i);
+    }
+  }
+  
+  // Restaurer l'état de la matrice
+  popMatrix();
+}
+
+void renderMummyAt(int niveau) {
+  Momie momie = momies[niveau];
+  if (momie == null) return;
+  
+  // Ne générer la momie que si elle est à l'intérieur du labyrinthe
+  if (checkIfMummyOutsideAt(niveau)) {
+    return;
+  }
+  
+  pushMatrix();
+  
+  // Utiliser la position de la momie dans le labyrinthe
+  // On convertit les coordonnées du labyrinthe en coordonnées 3D
+  float mummyWorldX = (momie.posX) * 20; // 20 unités par cellule
+  float mummyWorldY = (momie.posY) * 20;
+  float mummyWorldZ = HAUTEURS_NIVEAUX[niveau] + 0; // Hauteur du niveau + décalage
+  
+  translate(mummyWorldX, mummyWorldZ, mummyWorldY);
+  
+  // Permet d'orienter la momie dans la direction de son déplacement
+  float angle = atan2(momie.dirY, momie.dirX);
+  rotateY(PI/2 - angle);
+  
+  // Ajuster l'échelle pour réduire la taille de la momie
+  scale(0.065);
+  
+  // Animation des bras
+  armAnim = (sin(frameCount * 0.05) + 1) / 2;
+  
+  // Dessin du corps
+  shape(mummyGroup.getChild("bodyGroup"));
+  shape(mummyGroup.getChild("headGroup"));
+  shape(mummyGroup.getChild("eyesGroup"));
+  
+  // Bras animés
+  pushMatrix();
+  rotateY(radians(armAnim * 70));
+  shape(mummyGroup.getChild("armsGroup").getChild("leftArm"));
+  popMatrix();
+  
+  pushMatrix();
+  rotateY(radians(-armAnim * 70));
+  shape(mummyGroup.getChild("armsGroup").getChild("rightArm"));
+  popMatrix();
+  
+  popMatrix();
+}
+
 
 // Mise à jour d'une momie spécifique
 void updateMummyAt(int niveau) {
@@ -223,71 +283,7 @@ void repositionMummyAt(int niveau) {
   momies[niveau].posY = LAB_SIZES[niveau]/2 + DECALAGES[niveau];
 }
 
-// Rendu de toutes les momies
-void renderAllMummies() {
-  // Sauvegarder l'état actuel de la matrice
-  pushMatrix();
-  rotateX(-PI/2);
-  
-  // Rendre chaque momie
-  for (int i = 0; i < NIVEAUX; i++) {
-    if (momies[i] != null) {
-      renderMummyAt(i);
-    }
-  }
-  
-  // Restaurer l'état de la matrice
-  popMatrix();
-}
 
-// Rendu d'une momie spécifique
-void renderMummyAt(int niveau) {
-  Momie momie = momies[niveau];
-  if (momie == null) return;
-  
-  // Ne générer la momie que si elle est à l'intérieur du labyrinthe
-  if (checkIfMummyOutsideAt(niveau)) {
-    return;
-  }
-  
-  pushMatrix();
-  
-  // Utiliser la position de la momie dans le labyrinthe
-  // On convertit les coordonnées du labyrinthe en coordonnées 3D
-  float mummyWorldX = (momie.posX) * 20; // 20 unités par cellule
-  float mummyWorldY = (momie.posY) * 20;
-  float mummyWorldZ = HAUTEURS_NIVEAUX[niveau] + 0; // Hauteur du niveau + décalage
-  
-  translate(mummyWorldX, mummyWorldZ, mummyWorldY);
-  
-  // Permet d'orienter la momie dans la direction de son déplacement
-  float angle = atan2(momie.dirY, momie.dirX);
-  rotateY(PI/2 - angle);
-  
-  // Ajuster l'échelle pour réduire la taille de la momie
-  scale(0.065);
-  
-  // Animation des bras
-  armAnim = (sin(frameCount * 0.05) + 1) / 2;
-  
-  // Dessin du corps
-  shape(mummyGroup.getChild("bodyGroup"));
-  shape(mummyGroup.getChild("headGroup"));
-  shape(mummyGroup.getChild("eyesGroup"));
-  
-  // Bras animés
-  pushMatrix();
-  rotateY(radians(armAnim * 70));
-  shape(mummyGroup.getChild("armsGroup").getChild("leftArm"));
-  popMatrix();
-  
-  pushMatrix();
-  rotateY(radians(-armAnim * 70));
-  shape(mummyGroup.getChild("armsGroup").getChild("rightArm"));
-  popMatrix();
-  
-  popMatrix();
-}
 
 // Vérifier les collisions avec toutes les momies
 void checkAllMummiesCollision() {
@@ -327,27 +323,8 @@ void checkMummyCollisionAt(int niveau) {
     posZ = HAUTEURS_NIVEAUX[0];
     dirX = 0;
     dirY = 1;
+    niveauActuel = 0;
+    NIVEAUACTUEL = 0; // On met aussi à jour la variable globale NIVEAUACTUEL
     initBrouillardMiniMap();
-  }
-}
-
-// Dessiner toutes les momies sur la minimap
-void drawAllMummiesOnMiniMap(int mapX, int mapY, int cellSize) {
-  // Dessiner uniquement la momie du niveau actuel
-  if (momies[niveauActuel] != null) {
-    Momie momie = momies[niveauActuel];
-    
-    fill(255, 0, 255); // Couleur violette pour la momie
-    ellipse(mapX + (momie.posX-DECALAGES[niveauActuel])*cellSize, 
-            mapY + (momie.posY-DECALAGES[niveauActuel])*cellSize, 
-            cellSize*1.2, cellSize*1.2);
-    
-    // On dessine la direction de la momie
-    stroke(255, 165, 0); // Orange pour la direction de la momie
-    line(mapX + (momie.posX-DECALAGES[niveauActuel])*cellSize, 
-         mapY + (momie.posY-DECALAGES[niveauActuel])*cellSize, 
-         mapX + (momie.posX-DECALAGES[niveauActuel] + momie.dirX)*cellSize, 
-         mapY + (momie.posY-DECALAGES[niveauActuel] + momie.dirY)*cellSize);
-    noStroke();
   }
 }

@@ -244,6 +244,27 @@ void updateMummy() {
   mummyPos.set(mummyPosX * 20, mummyPosY * 20, HAUTEURS_NIVEAUX[mummyNiveau]);
 }
 
+// Dessine la momie du rez de chaussée sur la minimap (car après on les cache pour complexifier le jeu).
+void drawRDCMummyOnMiniMap(int mapX, int mapY, int cellSize) {
+  if (momies[niveauActuel] != null) {
+    Momie momie = momies[niveauActuel];
+    
+    fill(255, 0, 255); // Couleur violette pour la momie
+    ellipse(mapX + (momie.posX-DECALAGES[niveauActuel])*cellSize, 
+            mapY + (momie.posY-DECALAGES[niveauActuel])*cellSize, 
+            cellSize*1.2, cellSize*1.2);
+    
+    // On dessine la direction de la momie
+    stroke(255, 165, 0); // Orange pour la direction de la momie
+    line(mapX + (momie.posX-DECALAGES[niveauActuel])*cellSize, 
+         mapY + (momie.posY-DECALAGES[niveauActuel])*cellSize, 
+         mapX + (momie.posX-DECALAGES[niveauActuel] + momie.dirX)*cellSize, 
+         mapY + (momie.posY-DECALAGES[niveauActuel] + momie.dirY)*cellSize);
+    noStroke();
+  }
+}
+
+
 
 //=====================FONCTION  MOMIE===================================
 // ==========================================================

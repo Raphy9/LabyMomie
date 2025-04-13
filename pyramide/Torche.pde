@@ -1,15 +1,7 @@
-/**
- * Crée l'ensemble de la torche sous forme d'un PShape GROUP :
- *  - Manche (profil révolutionné)
- *  - Collier autour du manche (profil révolutionné)
- *  - Flamme (contour 2D extrudé)
- */
 PShape createTorch3D() {
   PShape torch = createShape(GROUP);
   
-  // 1) Manche
-  // Le profil est un tableau de PVector (x, y) en vue de côté
-  // On le "révolutionne" autour de l'axe Y, avec revolveDetail segments
+  // Manche
   PVector[] handleProfile = {
     new PVector(  0,  0 ),   // Base (rayon = 0, y=0)
     new PVector(  5,  0 ),   // Léger rayon au bas du manche
@@ -24,8 +16,6 @@ PShape createTorch3D() {
   torch.addChild(handle);
 
   // 2) Collier (anneau) près du sommet
-  // On crée un petit anneau en forme de “bague” au-dessus du manche
-  // Même principe : on décrit un petit profil évasé et on le “révolutionne”
   PVector[] ringProfile = {
     new PVector(4, 120),  // Doit coller à la fin du manche
     new PVector(6, 125),  // Légèrement plus large
@@ -39,19 +29,12 @@ PShape createTorch3D() {
   torch.addChild(ring);
 
   // 3) Flamme (extrusion)
-  // On la place juste au-dessus de l’anneau (disons y ~145)
-  // On définit un contour en 2D, puis on l’extrude sur +/- 5 en Z
   PShape flame = createFlamme3D();
   torch.addChild(flame);
 
   return torch;
 }
 
-/**
- * Génère un PShape 3D en “révolutionnant” un profil 2D autour de l’axe Y.
- *  - profile : tableau de PVector (x, y) décrivant la silhouette en coupe
- *  - revolveDetail : nombre de segments de révolution (plus c’est grand, plus c’est lisse)
- */
 PShape revolveShape(PVector[] profile, int revolveDetail) {
   PShape shape3D = createShape();
   shape3D.beginShape(QUADS);

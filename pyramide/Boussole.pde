@@ -7,7 +7,7 @@ void drawCompass() {
   perspective();
   hint(DISABLE_DEPTH_TEST);
   scale(0.4);
-  rotateX(radians(25));  
+  rotateX(radians(25));
   rotateY(PI);
   rotateZ(radians(-30));
   pushMatrix();
@@ -18,7 +18,7 @@ void drawCompass() {
   drawCompassFace(compassRadius);
   popMatrix();
   hint(ENABLE_DEPTH_TEST);
-  
+
   popMatrix();
 }
 
@@ -37,7 +37,7 @@ void drawCompassBody(float radius, float thickness) {
     float angle = i * angleStep;
     float x = cos(angle) * radius;
     float y = sin(angle) * radius;
-    // On relie deux points : (x, y, -halfH) et (x, y, +halfH) 
+    // On relie deux points : (x, y, -halfH) et (x, y, +halfH)
     vertex(x, y, -halfH);
     vertex(x, y, +halfH);
   }
@@ -46,13 +46,13 @@ void drawCompassBody(float radius, float thickness) {
   // --- Face du bas ---
   // On dessine un disque (TRIANGLE_FAN)
   beginShape(TRIANGLE_FAN);
-    vertex(0, 0, +halfH);   // centre
-    for (int i = 0; i <= nbSteps; i++) {
-      float angle = i * angleStep;
-      float x = cos(angle) * radius;
-      float y = sin(angle) * radius;
-      vertex(x, y, +halfH);
-    }
+  vertex(0, 0, +halfH);   // centre
+  for (int i = 0; i <= nbSteps; i++) {
+    float angle = i * angleStep;
+    float x = cos(angle) * radius;
+    float y = sin(angle) * radius;
+    vertex(x, y, +halfH);
+  }
   endShape();
 }
 
@@ -71,53 +71,53 @@ void drawCompassFace(float radius) {
   pushMatrix();
   translate(0, 0, -1);
 
-    // --- Points cardinaux (N, E, S, O) plus petits à l'intérieur ---
-    pushMatrix();
-      textAlign(CENTER, CENTER);
-      textSize(25);
-      fill(0);
-      float textRadius = radius * 0.7;
-      
-      pushMatrix();
-        translate(0, -textRadius);
-        rotateX(PI);
-        text("N", 0, 0);
-      popMatrix();
+  // --- Points cardinaux (N, E, S, O) plus petits à l'intérieur ---
+  pushMatrix();
+  textAlign(CENTER, CENTER);
+  textSize(25);
+  fill(0);
+  float textRadius = radius * 0.7;
 
-      pushMatrix();
-        translate(textRadius, 0);
-        rotateY(PI);
-        text("E", 0, 0);
-      popMatrix();
+  pushMatrix();
+  translate(0, -textRadius);
+  rotateX(PI);
+  text("N", 0, 0);
+  popMatrix();
 
-      pushMatrix();
-        translate(0, textRadius);
-        rotateY(PI);
-        text("S", 0, 0);
-      popMatrix();
+  pushMatrix();
+  translate(textRadius, 0);
+  rotateY(PI);
+  text("E", 0, 0);
+  popMatrix();
 
-      pushMatrix();
-        translate(-textRadius, 0);
-        rotateY(PI);
-        text("O", 0, 0);
-      popMatrix();
-    popMatrix();
-    
-    // Rotation des aiguilles en fonction de l'orientation du joueur
-    pushMatrix();
-      // Remarque : les aiguilles doivent tourner dans le sens inverse du joueur pour indiquer le nord correctement
-      float angleNorth = -currentAngle;
-      rotate(angleNorth);
-      
-      // Aiguille Nord (rouge)
-      drawNeedle(radius * 0.52, 8, color(200, 0, 0));
-      
-      // Aiguille Sud (bleue)
-      pushMatrix();
-        rotate(PI);
-        drawNeedle(radius * 0.52, 8, color(0, 0, 200));
-      popMatrix();
-    popMatrix();
+  pushMatrix();
+  translate(0, textRadius);
+  rotateY(PI);
+  text("S", 0, 0);
+  popMatrix();
+
+  pushMatrix();
+  translate(-textRadius, 0);
+  rotateY(PI);
+  text("O", 0, 0);
+  popMatrix();
+  popMatrix();
+
+  // Rotation des aiguilles en fonction de l'orientation du joueur
+  pushMatrix();
+  // Remarque : les aiguilles doivent tourner dans le sens inverse du joueur pour indiquer le nord correctement
+  float angleNorth = -currentAngle;
+  rotate(angleNorth);
+
+  // Aiguille Nord (rouge)
+  drawNeedle(radius * 0.52, 8, color(200, 0, 0));
+
+  // Aiguille Sud (bleue)
+  pushMatrix();
+  rotate(PI);
+  drawNeedle(radius * 0.52, 8, color(0, 0, 200));
+  popMatrix();
+  popMatrix();
 
   popMatrix();
 }
@@ -128,15 +128,15 @@ void drawCompassFace(float radius) {
 void circle3D(float r) {
   int nbSteps = 20;
   float angleStep = TWO_PI / nbSteps;
-  
+
   beginShape(TRIANGLE_FAN);
-    vertex(0, 0, 0); // centre
-    for (int i=0; i<=nbSteps; i++) {
-      float angle = i * angleStep;
-      float x = cos(angle) * r;
-      float y = sin(angle) * r;
-      vertex(x, y, 0);
-    }
+  vertex(0, 0, 0); // centre
+  for (int i=0; i<=nbSteps; i++) {
+    float angle = i * angleStep;
+    float x = cos(angle) * r;
+    float y = sin(angle) * r;
+    vertex(x, y, 0);
+  }
   endShape();
 }
 
@@ -144,13 +144,13 @@ void drawNeedle(float length, float baseHalfWidth, color col) {
   noStroke();
   fill(col);
   beginShape();
-    // Coin de gauche à la base
-    vertex(-baseHalfWidth, 0, 0);
-    // Pointe, fine
-    vertex(-2, -length, 0);
-    vertex(2, -length, 0);
-    // Coin de droite à la base
-    vertex(baseHalfWidth, 0, 0);
+  // Coin de gauche à la base
+  vertex(-baseHalfWidth, 0, 0);
+  // Pointe, fine
+  vertex(-2, -length, 0);
+  vertex(2, -length, 0);
+  // Coin de droite à la base
+  vertex(baseHalfWidth, 0, 0);
   endShape(CLOSE);
 }
 
@@ -159,7 +159,7 @@ void drawNeedle(float length, float baseHalfWidth, color col) {
  */
 void line3D(float x1, float y1, float x2, float y2) {
   beginShape(LINES);
-    vertex(x1, y1, 0);
-    vertex(x2, y2, 0);
+  vertex(x1, y1, 0);
+  vertex(x2, y2, 0);
   endShape();
 }

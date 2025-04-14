@@ -30,7 +30,7 @@ float sandGrain(vec2 uv, vec2 center, float size) {
 
 void main() {
     // Coordonnées normalisées
-    vec2 uv = vertTexCoord.st;
+  vec2 uv = gl_FragCoord.xy / resolution;
 
     // Couleur de base (texture originale)
     vec4 baseColor = texture2D(texture, uv);

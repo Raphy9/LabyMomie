@@ -4,12 +4,11 @@ final int[] LAB_SIZES = {21, 19, 17, 15, 13, 11, 9, 7, 5, 3};
 // Attention, un mur fait 20 unités de hauteur !
 final float[] HAUTEURS_NIVEAUX = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180};
 final float HAUTEUR_SOMMET = 200;
-final int[] DECALAGES = {0,1,2,3,4,5,6,7,8,9};
+final int[] DECALAGES = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-// Pour générer un labyrinthe pour un niveau spécifique (un mix du TP et quelques updates en plus mais je n'ai pas trop testé comme ça marchait pour les étages)
 void genererLabyrinthe(int niveau) {
   int labSize = LAB_SIZES[niveau];
-  
+
   int todig = 0;
   for (int j=0; j<labSize; j++) {
     for (int i=0; i<labSize; i++) {
@@ -24,7 +23,7 @@ void genererLabyrinthe(int niveau) {
         labyrinthes[niveau][j][i] = '#';
     }
   }
-  
+
   int gx = 1;
   int gy = 1;
   while (todig > 0) {
@@ -47,12 +46,12 @@ void genererLabyrinthe(int niveau) {
   // Entrée et sortie du labyrinthe (uniquement pour le niveau 0)
   if (niveau == 0) {
     // On ouvre l'entrée sur la face extérieure
-    labyrinthes[niveau][0][1] = ' '; 
-    // On ouvre aussi la « sortie » 
+    labyrinthes[niveau][0][1] = ' ';
+    // On ouvre aussi la « sortie »
     labyrinthes[niveau][labSize - 2][labSize - 1] = ' ';
   } else {
     // Pour les niveaux supérieurs, on bouche l'emplacement qui servait d'entrée
-    labyrinthes[niveau][0][1] = '#'; 
+    labyrinthes[niveau][0][1] = '#';
     // éventuellement on laisse la « sortie » du côté que tu veux
     // labyrinthes[niveau][labSize - 2][labSize - 1] = ' ';
   }
@@ -69,21 +68,21 @@ void genererLabyrinthe(int niveau) {
   for (int j=1; j<labSize-1; j++) {
     for (int i=1; i<labSize-1; i++) {
       if (labyrinthes[niveau][j][i]==' ' || labyrinthes[niveau][j][i]=='E' || labyrinthes[niveau][j][i]=='D') {
-        if (labyrinthes[niveau][j-1][i]=='#' && 
-            (labyrinthes[niveau][j+1][i]==' ' || labyrinthes[niveau][j+1][i]=='E' || labyrinthes[niveau][j+1][i]=='D') &&
-            labyrinthes[niveau][j][i-1]=='#' && labyrinthes[niveau][j][i+1]=='#')
-          sides[niveau][j-1][i][0] = 1;// c'est un bout de couloir vers le haut 
-        if ((labyrinthes[niveau][j-1][i]==' ' || labyrinthes[niveau][j-1][i]=='E' || labyrinthes[niveau][j-1][i]=='D') && 
-            labyrinthes[niveau][j+1][i]=='#' &&
-            labyrinthes[niveau][j][i-1]=='#' && labyrinthes[niveau][j][i+1]=='#')
-          sides[niveau][j+1][i][3] = 1;// c'est un bout de couloir vers le bas 
+        if (labyrinthes[niveau][j-1][i]=='#' &&
+          (labyrinthes[niveau][j+1][i]==' ' || labyrinthes[niveau][j+1][i]=='E' || labyrinthes[niveau][j+1][i]=='D') &&
+          labyrinthes[niveau][j][i-1]=='#' && labyrinthes[niveau][j][i+1]=='#')
+          sides[niveau][j-1][i][0] = 1;// c'est un bout de couloir vers le haut
+        if ((labyrinthes[niveau][j-1][i]==' ' || labyrinthes[niveau][j-1][i]=='E' || labyrinthes[niveau][j-1][i]=='D') &&
+          labyrinthes[niveau][j+1][i]=='#' &&
+          labyrinthes[niveau][j][i-1]=='#' && labyrinthes[niveau][j][i+1]=='#')
+          sides[niveau][j+1][i][3] = 1;// c'est un bout de couloir vers le bas
         if (labyrinthes[niveau][j-1][i]=='#' && labyrinthes[niveau][j+1][i]=='#' &&
-            (labyrinthes[niveau][j][i-1]==' ' || labyrinthes[niveau][j][i-1]=='E' || labyrinthes[niveau][j][i-1]=='D') && 
-            labyrinthes[niveau][j][i+1]=='#')
+          (labyrinthes[niveau][j][i-1]==' ' || labyrinthes[niveau][j][i-1]=='E' || labyrinthes[niveau][j][i-1]=='D') &&
+          labyrinthes[niveau][j][i+1]=='#')
           sides[niveau][j][i+1][1] = 1;// c'est un bout de couloir vers la droite
         if (labyrinthes[niveau][j-1][i]=='#' && labyrinthes[niveau][j+1][i]=='#' &&
-            labyrinthes[niveau][j][i-1]=='#' && 
-            (labyrinthes[niveau][j][i+1]==' ' || labyrinthes[niveau][j][i+1]=='E' || labyrinthes[niveau][j][i+1]=='D'))
+          labyrinthes[niveau][j][i-1]=='#' &&
+          (labyrinthes[niveau][j][i+1]==' ' || labyrinthes[niveau][j][i+1]=='E' || labyrinthes[niveau][j][i+1]=='D'))
           sides[niveau][j][i-1][2] = 1;// c'est un bout de couloir vers la gauche
       }
     }
@@ -98,7 +97,7 @@ PShape genererShapeNiveau(int niveau) {
   int labSize = LAB_SIZES[niveau];
   float hauteurNiveau = HAUTEURS_NIVEAUX[niveau];
   int decalage = DECALAGES[niveau];
-  
+
   noStroke();
   // Parcours de toutes les cases du labyrinthe du niveau
   for (int j = 0; j < labSize; j++) {
@@ -109,11 +108,11 @@ PShape genererShapeNiveau(int niveau) {
       float transX = (i + decalage) * 20;
       float transY = (j + decalage) * 20;
       float transZ = hauteurNiveau;
-      
+
       // Selon le caractère de la cellule, on recrée les dessins déjà faits dans renderNiveauPyramide
       if (labyrinthes[niveau][j][i] == '#') {
         boolean estExterieur = (i == 0 || i == labSize - 1 || j == 0 || j == labSize - 1);
-        
+
         // Mur Nord (face avant)
         if (j == 0 || labyrinthes[niveau][j-1][i] != '#') {
           PShape murNord = createShape();
@@ -132,7 +131,7 @@ PShape genererShapeNiveau(int niveau) {
           murNord.translate(transX, transY, transZ);
           cellShape.addChild(murNord);
         }
-        
+
         // Mur Sud (face arrière)
         if (j == labSize - 1 || labyrinthes[niveau][j+1][i] != '#') {
           PShape murSud = createShape();
@@ -151,7 +150,7 @@ PShape genererShapeNiveau(int niveau) {
           murSud.translate(transX, transY, transZ);
           cellShape.addChild(murSud);
         }
-        
+
         // Mur Est (face droite)
         if (i == labSize - 1 || labyrinthes[niveau][j][i+1] != '#') {
           PShape murEst = createShape();
@@ -170,7 +169,7 @@ PShape genererShapeNiveau(int niveau) {
           murEst.translate(transX, transY, transZ);
           cellShape.addChild(murEst);
         }
-        
+
         // Mur Ouest (face gauche)
         if (i == 0 || labyrinthes[niveau][j][i-1] != '#') {
           PShape murOuest = createShape();
@@ -189,7 +188,7 @@ PShape genererShapeNiveau(int niveau) {
           murOuest.translate(transX, transY, transZ);
           cellShape.addChild(murOuest);
         }
-        
+
         // Plafond (face supérieure)
         PShape plafond = createShape();
         plafond.beginShape(QUADS);
@@ -202,7 +201,7 @@ PShape genererShapeNiveau(int niveau) {
         plafond.endShape();
         plafond.translate(transX, transY, transZ);
         cellShape.addChild(plafond);
-        
+
         // Sol (face inférieure)
         PShape sol = createShape();
         sol.beginShape(QUADS);
@@ -215,8 +214,7 @@ PShape genererShapeNiveau(int niveau) {
         sol.endShape();
         sol.translate(transX, transY, transZ);
         cellShape.addChild(sol);
-      }
-      else if (labyrinthes[niveau][j][i] == ' ') {
+      } else if (labyrinthes[niveau][j][i] == ' ') {
         // Sol pour les cases vides - GRIS
         PShape solVide = createShape();
         solVide.beginShape(QUADS);
@@ -230,7 +228,7 @@ PShape genererShapeNiveau(int niveau) {
         solVide.endShape();
         solVide.translate(transX, transY, transZ);
         cellShape.addChild(solVide);
-        
+
         // Plafond pour les cases vides - GRIS
         PShape plafondVide = createShape();
         plafondVide.beginShape(QUADS);
@@ -244,8 +242,7 @@ PShape genererShapeNiveau(int niveau) {
         plafondVide.endShape();
         plafondVide.translate(transX, transY, transZ);
         cellShape.addChild(plafondVide);
-      }
-      else if (labyrinthes[niveau][j][i] == 'E' || labyrinthes[niveau][j][i] == 'D') {
+      } else if (labyrinthes[niveau][j][i] == 'E' || labyrinthes[niveau][j][i] == 'D') {
         // Marqueur pour l'emplacement des escaliers
         PShape escalier = createShape();
         escalier.beginShape(QUADS);
@@ -263,7 +260,7 @@ PShape genererShapeNiveau(int niveau) {
         escalier.translate(transX, transY, transZ);
         cellShape.addChild(escalier);
       }
-      
+
       // Ajouter la cellule au niveau
       niveauShape.addChild(cellShape);
     }

@@ -44,76 +44,12 @@ PImage textureSolPlafondJaune;
 
 PShape lanterneModel;
 
-
 float time = 0;
 
-
-
-class Particle {
-  // Position de base de la particule (relative à la torche)
-  PVector basePos;
-  float size;
-  int fillColor;
-  // Décalage dynamique qui sera ajouté à la position de base
-  PVector offset;
-  
-  Particle(PVector pos, float size, int col) {
-    this.basePos = pos.copy();
-    this.size = size;
-    this.fillColor = col;
-    this.offset = new PVector(0, 0, 0);
-  }
-  
-  // Update() calcule un décalage en fonction du temps (frameCount)
-  void update() {
-    // On utilise sin pour une oscillation et noise pour du mouvement organique
-    float flickerY = sin(frameCount * 0.1 + basePos.x + basePos.z) * 2;
-    
-    offset.x = (noise(basePos.x, frameCount * 0.05f) - 0.5f) * 4;
-    offset.z = (noise(basePos.z, frameCount * 0.05f) - 0.5f) * 4;
-    offset.y = flickerY + (noise(basePos.y, frameCount * 0.05f) - 0.5f) * 2+20;
-    
-    // Optionnel : si tu souhaites simuler une ascension continue, tu peux ajouter un terme constant à offset.y
-  }
-  
-  // Affiche la particule à sa position dynamique
-  void display() {
-    pushMatrix();
-    translate(basePos.x + offset.x, basePos.y + offset.y, basePos.z + offset.z);
-    noStroke();
-    fill(fillColor);
-    sphere(size);
-    popMatrix();
-  }
-}
-ArrayList<Particle> flameParticles;
-
-
 void setup() {
-  
-  // Génération des particules de la flamme
-  flameParticles = new ArrayList<Particle>();
-  int numParticles = 800;  // Même nombre qu'avant
-  for (int i = 0; i < numParticles; i++) {
-    // Taille aléatoire pour la particule (entre 1 et 3)
-    float particleSize = random(1, 3);
-    // Position aléatoire dans la zone de la flamme (tu peux adapter les plages si besoin)
-    float x = random(-8, 8);
-    float y = random(120, 180);
-    float z = random(-8, 8);
-    PVector pos = new PVector(x, y, z);
-    
-    // Couleur de la particule : orange vif avec opacité variable
-    int r = 255;
-    int g = (int)random(120, 200);
-    int b = 0;
-    int a = (int)random(150, 255);
-    int col = color(r, g, b, a);
-    
-    flameParticles.add(new Particle(pos, particleSize, col));
-  }
-  
-  
+
+  genererFlammeParticules();
+
   ambiantExterieur = new SoundFile(this, "ambiant_exterieur.mp3");
   ambiantInterieur = new SoundFile(this, "ambiant_interieur.mp3");
   reveal = new SoundFile(this, "reveal.mp3");
@@ -122,7 +58,7 @@ void setup() {
   button = new SoundFile(this, "button.mp3");
 
   ambiantExterieur.loop();
-  
+
   frameRate(20);
   randomSeed(2);
   size(1000, 830, P3D);
@@ -139,7 +75,7 @@ void setup() {
   textureSolPlafondJaune = createTextureJaune(textureSolPlafond);
   textureStoneJaune = textureStone;
   textureSable = loadImage("desert.png");
-  
+
   textureCiel = loadImage("ciel.png");
 
   textureMode(NORMAL);
@@ -167,7 +103,7 @@ void setup() {
   decouvert = new boolean[NIVEAUX][][];
 
   initBrouillardMiniMap();
-  
+
   // Initialisation des variables de position et direction
   posX = 1.4;
   posY = 1.0;
@@ -179,7 +115,7 @@ void setup() {
   oldPosX = posX;
   oldPosY = posY;
   oldPosZ = posZ;
-  
+
   // Initialisation des momies pour chaque niveau
   initMomies();
 }
@@ -199,8 +135,8 @@ void draw() {
 }
 
 void drawGame() {
-    renderMummy();
-    updateMummy();
+  renderMummy();
+  updateMummy();
   if (!estExterieur) {
     // Si on est à l'intérieur et que le son extérieur joue, on l'arrête
     if (ambiantExterieur.isPlaying()) {
@@ -220,7 +156,7 @@ void drawGame() {
       ambiantExterieur.loop();
     }
   }
-  
+
   float camX, camY, camZ, lookX, lookY, lookZ;
 
   // On calcule le delta temps approximatif en fonction du frameRate courant
@@ -300,7 +236,7 @@ void drawGame() {
   if (anim > 0) {
     anim--;
   }
-  
+
   gestionDeplacements();
   updateRotationAnimation();
 
@@ -313,7 +249,7 @@ void drawGame() {
   estExterieur = checkSiExterieur();
 
   resetShader();
-  
+
   noTint();
 
   configLights();
@@ -321,8 +257,8 @@ void drawGame() {
   gestionRenderSol();
 
   renderPyramide();
-  
-  renderAllMummies();
+
+  renderRDCMummy();
 
   noTint();
 
@@ -331,7 +267,7 @@ void drawGame() {
   if (estExterieur) {
     applySandstormEffect();
   }
-  
+
   if (!estExterieur) {
     pushMatrix();
     // On réinitialise la matrice pour passer en coordonnées écran
@@ -348,9 +284,9 @@ void drawGame() {
 
     rotateX(radians(15));
     rotateY(radians(10));
-    
+
     scale(-3);
-    pointLight(251, 139, 35, width - offsetX+90 , height - offsetY+240, 0); 
+    pointLight(251, 139, 35, width - offsetX+90, height - offsetY+240, 0);
     lanterneModel.texture(textureStone);
     shape(lanterneModel);
     updateAndRenderFlame();
@@ -359,8 +295,8 @@ void drawGame() {
   }
   noLights();
   drawCompass();
-  
-  if(!estExterieur) {
+
+  if (!estExterieur) {
     noLights();
     drawMiniMap();
   }
@@ -405,7 +341,7 @@ void configLights() {
   if (estExterieur) {
     directionalLight(180, 180, 180, 0.5, 0.5, -1);
 
-    // Ajout d'une lumière ambiante faible pour éviter le noir complet dans les zones d'ombre
+    // On ajoute une lumière ambiante faible pour éviter le noir complet dans les zones d'ombre.
     ambientLight(40, 40, 50);
   } else {
     float falloffConstant   = 0.8;    // Atténuation constante
@@ -424,7 +360,7 @@ void configLights() {
     float lx = posX * 20;
     float ly = posY * 20;
     float lz = posZ + hauteur;
-    
+
 
     // Lumière ponctuelle qui fera office de lanterne
     ambientLight(r, g, b, lx-8, ly, lz);

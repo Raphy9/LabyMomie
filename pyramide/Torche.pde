@@ -29,10 +29,24 @@ PShape createTorch3D() {
   torch.addChild(ring);
 
   // 3) Flamme (extrusion)
-  PShape flame = createFlamme3D();
-  torch.addChild(flame);
+ // PShape flame = createFlamme3D();
+ // torch.addChild(flame);
 
   return torch;
+}
+
+void updateAndRenderFlame() {
+  pushMatrix();
+  // Si nécessaire, adapte une translation pour que la flamme s'aligne avec le haut de la torche.
+  // Par exemple, si tes particules ont été définies en coordonnées "locales" correspondant à la torche,
+  // et que la torche se trouve déjà en position dans la scène, tu peux les dessiner directement.
+  
+  for (Particle p : flameParticles) {
+    p.update();
+    p.display();
+  }
+  
+  popMatrix();
 }
 
 PShape revolveShape(PVector[] profile, int revolveDetail) {

@@ -267,69 +267,6 @@ void drawRDCMummyOnMiniMap(int mapX, int mapY, int cellSize) {
 
 
 //=====================FONCTION  MOMIE===================================
-// ==========================================================
-// Système de particules
-// ==========================================================
-void updateParticles() {
-  // On ajoute quelques particules chaque frame
-  for (int i = 0; i < 5; i++) {
-    // On génère une position aléatoire sur une sphère autour du centre de la momie
-    PVector spawn = PVector.random3D();
-    spawn.mult(random(rGlobal * 0.8, rGlobal * 1.5));
-    particles.add(new Particle(spawn));
-  }
-  
-  // Mise à jour et suppression des particules trop vieilles
-  for (int i = particles.size()-1; i >= 0; i--) {
-    Particle p = particles.get(i);
-    p.update();
-    if (p.isDead()) {
-      particles.remove(i);
-    }
-  }
-}
-
-void displayParticles() {
-  // On affiche toutes les particules
-  for (Particle p : particles) {
-    p.display();
-  }
-}
-
-// ==========================================================
-// Classe Particle
-// ==========================================================
-class Particle {
-  PVector pos;
-  PVector vel;
-  float lifespan;
-  
-  Particle(PVector pos) {
-    this.pos = pos.copy();
-    // Vélocité aléatoire pour donner un léger mouvement
-    vel = PVector.random3D();
-    vel.mult(random(0.5, 2));
-    lifespan = 255;
-  }
-  
-  void update() {
-    pos.add(vel);
-    lifespan -= 2;
-  }
-  
-  void display() {
-    pushMatrix();
-    translate(pos.x, pos.y, pos.z);
-    noStroke();
-    fill(194, 167, 144, lifespan); // Couleur avec transparence
-    sphere(2);
-    popMatrix();
-  }
-  
-  boolean isDead() {
-    return lifespan < 0;
-  }
-}
 
 PShape buildArm() {
   // Paramètres du bras

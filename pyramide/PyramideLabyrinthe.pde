@@ -47,7 +47,73 @@ PShape lanterneModel;
 
 float time = 0;
 
+
+
+class Particle {
+  // Position de base de la particule (relative à la torche)
+  PVector basePos;
+  float size;
+  int fillColor;
+  // Décalage dynamique qui sera ajouté à la position de base
+  PVector offset;
+  
+  Particle(PVector pos, float size, int col) {
+    this.basePos = pos.copy();
+    this.size = size;
+    this.fillColor = col;
+    this.offset = new PVector(0, 0, 0);
+  }
+  
+  // Update() calcule un décalage en fonction du temps (frameCount)
+  void update() {
+    // On utilise sin pour une oscillation et noise pour du mouvement organique
+    float flickerY = sin(frameCount * 0.1 + basePos.x + basePos.z) * 2;
+    
+    offset.x = (noise(basePos.x, frameCount * 0.05f) - 0.5f) * 4;
+    offset.z = (noise(basePos.z, frameCount * 0.05f) - 0.5f) * 4;
+    offset.y = flickerY + (noise(basePos.y, frameCount * 0.05f) - 0.5f) * 2+20;
+    
+    // Optionnel : si tu souhaites simuler une ascension continue, tu peux ajouter un terme constant à offset.y
+  }
+  
+  // Affiche la particule à sa position dynamique
+  void display() {
+    pushMatrix();
+    translate(basePos.x + offset.x, basePos.y + offset.y, basePos.z + offset.z);
+    noStroke();
+    fill(fillColor);
+    sphere(size);
+    popMatrix();
+  }
+}
+ArrayList<Particle> flameParticles;
+
+
 void setup() {
+  
+  // Génération des particules de la flamme
+  flameParticles = new ArrayList<Particle>();
+  int numParticles = 800;  // Même nombre qu'avant
+  for (int i = 0; i < numParticles; i++) {
+    // Taille aléatoire pour la particule (entre 1 et 3)
+    float particleSize = random(1, 3);
+    // Position aléatoire dans la zone de la flamme (tu peux adapter les plages si besoin)
+    float x = random(-8, 8);
+    float y = random(120, 180);
+    float z = random(-8, 8);
+    PVector pos = new PVector(x, y, z);
+    
+    // Couleur de la particule : orange vif avec opacité variable
+    int r = 255;
+    int g = (int)random(120, 200);
+    int b = 0;
+    int a = (int)random(150, 255);
+    int col = color(r, g, b, a);
+    
+    flameParticles.add(new Particle(pos, particleSize, col));
+  }
+  
+  
   ambiantExterieur = new SoundFile(this, "ambiant_exterieur.mp3");
   ambiantInterieur = new SoundFile(this, "ambiant_interieur.mp3");
   reveal = new SoundFile(this, "reveal.mp3");
@@ -287,6 +353,7 @@ void drawGame() {
     pointLight(251, 139, 35, width - offsetX+90 , height - offsetY+240, 0); 
     lanterneModel.texture(textureStone);
     shape(lanterneModel);
+    updateAndRenderFlame();
     hint(ENABLE_DEPTH_TEST);
     popMatrix();
   }

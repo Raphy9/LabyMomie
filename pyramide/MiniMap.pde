@@ -133,6 +133,11 @@ void detectAndDisplayNearbyMummies(int centerX, int centerY, int detectorSize) {
 
     // Si la momie est à portée de détection
     if (distance < maxDetectionDistance) {
+      // On jouer le son
+      if (!radar.isPlaying()) {
+        radar.play();
+      }
+
       // On calcule la position relative de la momie par rapport au joueur
       float relativeX = dx / maxDetectionDistance * detectorRadius;
       float relativeY = dy / maxDetectionDistance * detectorRadius;

@@ -69,6 +69,7 @@ void animerMonteeDescente(int nouveauNiveau, float nouvellePosX, float nouvelleP
   // Mettre à jour le niveau actuel et la position
   niveauActuel = nouveauNiveau;
   NIVEAUACTUEL = nouveauNiveau;
+  mummyNiveau = nouveauNiveau;
   posX = nouvellePosX+0.4;
   posY = nouvellePosY+0.4;
   posZ = HAUTEURS_NIVEAUX[niveauActuel];

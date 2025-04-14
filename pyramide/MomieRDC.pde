@@ -250,7 +250,7 @@ void renderRDCMummy() {
 
   // Rendre chaque momie
   for (int i = 0; i < NIVEAUX; i++) {
-    if (momies[i] != null && i == 0) {
+    if (momies[i] != null && i == niveauActuel) {
       renderRDCMummyAt(i);
     }
   }

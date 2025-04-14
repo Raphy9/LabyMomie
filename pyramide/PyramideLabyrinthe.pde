@@ -6,6 +6,7 @@ SoundFile reveal;
 SoundFile death;
 SoundFile warp;
 SoundFile button;
+SoundFile radar;
 
 int revealDistance = 40;
 
@@ -56,6 +57,7 @@ void setup() {
   death = new SoundFile(this, "death.mp3");
   warp = new SoundFile(this, "warp.mp3");
   button = new SoundFile(this, "button.mp3");
+  radar = new SoundFile(this, "radar.mp3");
 
   ambiantExterieur.loop();
 
@@ -287,7 +289,6 @@ void drawGame() {
 
     scale(-3);
     pointLight(251, 139, 35, width - offsetX+90, height - offsetY+240, 0);
-    lanterneModel.texture(textureStone);
     shape(lanterneModel);
     updateAndRenderFlame();
     hint(ENABLE_DEPTH_TEST);

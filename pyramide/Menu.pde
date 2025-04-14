@@ -39,6 +39,7 @@ void drawMenu() {
   pushMatrix();
   renderCiel();
 
+
   translate(width/2, height/2, 0);
   camAngle += 0.01;
   rotateY(PI);
@@ -62,18 +63,10 @@ void drawMenu() {
   pushMatrix();
   translate(-1000, 300, 460);
   rotateX(PI/2);
+  
   renderPyramideLisseExterieure(240, 16, 20, true);
   popMatrix();
 
-  // Affichage de la momie à côté de la pyramide
-  /*
-  pushMatrix();
-   translate(-688, 300, -1100);
-   rotateX(PI/2);
-   scale(5);
-   renderMummy();
-   popMatrix();
-   */
 
   //Affichage du sol
   pushMatrix();

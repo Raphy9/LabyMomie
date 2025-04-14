@@ -6,6 +6,7 @@ final float[] HAUTEURS_NIVEAUX = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180};
 final float HAUTEUR_SOMMET = 200;
 final int[] DECALAGES = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
+<<<<<<< HEAD
 // ==== Initialisation des labyrinthes pour chaque niveau ====
 void initLevelLaby() {
   labyrinthes = new char[NIVEAUX][][];
@@ -24,6 +25,8 @@ void initLevelLaby() {
 }
 
 // ======= Genere un Laby ========
+=======
+>>>>>>> parent of 4220c78 (Structure code)
 void genererLabyrinthe(int niveau) {
   int labSize = LAB_SIZES[niveau];
 

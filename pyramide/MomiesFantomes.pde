@@ -260,5 +260,6 @@ void checkMummyCollisionAt(int niveau) {
     dirY = 1;
     niveauActuel = 0;
     NIVEAUACTUEL = 0; // On met aussi à jour la variable globale NIVEAUACTUEL
+    initBrouillardMiniMap();
   }
 }

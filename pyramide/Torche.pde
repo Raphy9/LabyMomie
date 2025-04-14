@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // ========== Crée un PShape de torche =============
+=======
+>>>>>>> parent of 4220c78 (Structure code)
 PShape createTorch3D() {
   PShape torch = createShape(GROUP);
   
@@ -6,7 +9,7 @@ PShape createTorch3D() {
   PVector[] handleProfile = {
     new PVector(  0,  0 ),   // Base (rayon = 0, y=0)
     new PVector(  5,  0 ),   // Léger rayon au bas du manche
-    new PVector(  7, 30 ),   // Manche qui s'élargit doucement
+    new PVector(  7, 30 ),   // Manche qui s’élargit doucement
     new PVector(  6, 60 ),   // Rétrécit un peu plus haut
     new PVector(  5, 90 ),   // Partie quasi cylindrique
     new PVector(  4, 120 )   // Haut du manche
@@ -20,7 +23,7 @@ PShape createTorch3D() {
   PVector[] ringProfile = {
     new PVector(4, 120),  // Doit coller à la fin du manche
     new PVector(6, 125),  // Légèrement plus large
-    new PVector(7, 135),  // Montée de l'anneau
+    new PVector(7, 135),  // Montée de l’anneau
     new PVector(6, 140),  // Redescente
     new PVector(4, 145)   // Retour vers la forme du manche
   };
@@ -29,16 +32,28 @@ PShape createTorch3D() {
   ring.setStroke(false);
   torch.addChild(ring);
 
+  // 3) Flamme (extrusion)
+ // PShape flame = createFlamme3D();
+ // torch.addChild(flame);
+
   return torch;
 }
 
+<<<<<<< HEAD
 // ==== Update les flammes de la torche =====
+=======
+>>>>>>> parent of 4220c78 (Structure code)
 void updateAndRenderFlame() {
   pushMatrix();
+  // Si nécessaire, adapte une translation pour que la flamme s'aligne avec le haut de la torche.
+  // Par exemple, si tes particules ont été définies en coordonnées "locales" correspondant à la torche,
+  // et que la torche se trouve déjà en position dans la scène, tu peux les dessiner directement.
+  
   for (Particle p : flameParticles) {
     p.update();
     p.display();
   }
+  
   popMatrix();
 }
 
@@ -61,6 +76,11 @@ PShape revolveShape(PVector[] profile, int revolveDetail) {
     for (int j = 0; j < profile.length - 1; j++) {
       PVector p1 = profile[j];
       PVector p2 = profile[j+1];
+
+      // Coordonnées en (x, y, z) lorsqu’on tourne autour de Y
+      // - x dépend de p.x * cos(...) et de p.x * sin(...)
+      // - y reste p.y (la hauteur)
+      // - z dépend de p.x * sin(...) et cos(...), etc.
 
       // 4 points du QUAD
       float x1 = p1.x*cos1; 
@@ -92,19 +112,36 @@ PShape revolveShape(PVector[] profile, int revolveDetail) {
 }
 
 /**
- * Crée une flamme avec un ensemble de particules de feu.
+ * Crée une "flamme" en remplaçant l'extrusion par un ensemble de particules de feu.
  * La fonction génère un PShape GROUP contenant plusieurs petites sphères positionnées
- * aléatoirement dans la zone de la flamme.
+ * aléatoirement dans la zone de la flamme (entre y ~150 et y ~220).
  */
 PShape createFlamme3D() {
+  // Création du groupe qui contiendra les particules
   PShape flameGroup = createShape(GROUP);
+<<<<<<< HEAD
   int numParticles = 800; // Nombre de particules
+=======
+>>>>>>> parent of 4220c78 (Structure code)
   
+  // Nombre de particules que l'on souhaite générer
+  int numParticles = 800;
+  
+  // Plage de variation pour la position (en x, y, z)
+  // Ici, la flamme sera située entre y = 150 et y = 220,
+  // avec x variant approximativement de -20 à 20 et z de -4 à 4.
   for (int i = 0; i < numParticles; i++) {
+<<<<<<< HEAD
     float particleSize = random(1, 3);
+=======
+    // Taille aléatoire pour la particule (pour varier l'aspect du feu)
+    float particleSize = random(1, 3);
+    // Création d'une sphère pour représenter la particule
+>>>>>>> parent of 4220c78 (Structure code)
     PShape particle = createShape(SPHERE, particleSize);
     
-    // couleur et transparence
+    // Couleur de base : un orange vif, avec une légère variation aléatoire dans le canal vert
+    // On ajoute une opacité (alpha) aléatoire pour donner un effet plus "vivant"
     int r = 255;
     int g = (int)random(120, 200);
     int b = 0;
@@ -116,6 +153,8 @@ PShape createFlamme3D() {
     float x = random(-8, 8);
     float y = random(120, 180);
     float z = random(-8, 8);
+    
+    // Appliquer une translation pour positionner la particule
     particle.translate(x, y, z);
     
     // Ajouter la particule au groupe
@@ -124,3 +163,5 @@ PShape createFlamme3D() {
   
   return flameGroup;
 }
+
+   

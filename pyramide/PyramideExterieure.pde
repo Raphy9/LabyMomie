@@ -20,6 +20,7 @@ PImage createTextureJaune(PImage original) {
   return result;
 }
 
+<<<<<<< HEAD
 // ======= Affiche les 3 faces lisses des pyramides =========
 void renderPyramide() {
   // Pyramide d'origine (existante)
@@ -43,12 +44,17 @@ void renderPyramide() {
 }
 
 // ============= Affiche la face lisse d'une pyramide =========
+=======
+>>>>>>> parent of 4220c78 (Structure code)
 void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites, boolean onBouche) {
+  // Taille de base : la pyramide la plus large fait 21 cases × 20 unités = 420
   float baseSize = nbCases * nbUnites;
+  // On place le sommet à 300 en Z
   float apexZ = hauteurSommet;
 
   pushMatrix();
   noStroke();
+
   textureWrap(REPEAT);
   float t = -apexZ / (20 - apexZ);
   
@@ -62,6 +68,7 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
   vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
   endShape();
 
+
   // Face 1 (devant toit)
   beginShape(TRIANGLES);
   fill(255);
@@ -70,9 +77,59 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
   vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
 
+<<<<<<< HEAD
   // Face pour l'entrée :
   
     // Entrée droite (quad)
+=======
+
+  // Face 1 (devant)
+  beginShape(TRIANGLES);
+  texture(textureStoneJaune);
+  // On mappe la texture comme on veut (u,v). Ici, simple.
+  vertex(0, 0, 20, 0, 0);
+  vertex(baseSize, 0, 20, 20, 0);
+  vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
+  endShape();
+
+  //truc pour l'entrée etc..
+  // Entrée droite (quad)
+  beginShape(QUADS);
+  texture(textureStoneJaune);
+  vertex(baseSize, 0, 20, 0, 0);             // haut gauche
+  vertex(40, 0, 20, 18, 0);                   // haut droite
+  vertex(40, -15, 0, 18, 1.2);                 // bas droite
+  vertex(baseSize+15, -15, 0, 0, 1.2);        // bas gauche
+  endShape();
+
+  // Côté droit (triangle)
+  beginShape(TRIANGLES);
+  texture(textureStoneJaune);
+  vertex(40, 0, 20, 0, 0);                    // sommet haut
+  vertex(40, -15, 0, 0, 1);                 // bas gauche
+  vertex(40, 0, 0, 0.8, 1);                    // bas droite
+  endShape();
+
+  // Entrée gauche (quad)
+  beginShape(QUADS);
+  texture(textureStoneJaune);
+  vertex(20, 0, 20, 0, 0);                   // haut gauche
+  vertex(0, 0, 20, 1.2, 0);                     // haut droite
+  vertex(-15, -15, 0, 1.2, 1.2);                 // bas droite
+  vertex(20, -15, 0, 0, 1.2);                 // bas gauche
+  endShape();
+
+  // Côté gauche (triangle)
+  beginShape(TRIANGLES);
+  texture(textureStoneJaune);
+  vertex(20, 0, 20, 0, 0);                    // sommet haut
+  vertex(20, 0, 0, 0.8, 1);                    // bas droite
+  vertex(20, -15, 0, 0, 1);                 // bas gauche
+  endShape();
+
+  // Porte avant
+  if (onBouche) {
+>>>>>>> parent of 4220c78 (Structure code)
     beginShape(QUADS);
     texture(textureStoneJaune);
     vertex(baseSize, 0, 20, 0, 0);             // haut gauche
@@ -127,6 +184,8 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
 
   // ===== FACE 2 ======
 
+
+
   // Face 2 (arrière)
   beginShape(TRIANGLES);
   texture(textureStoneJaune);
@@ -143,7 +202,11 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
   vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
 
+<<<<<<< HEAD
   // ===== FACE 3 ======
+=======
+
+>>>>>>> parent of 4220c78 (Structure code)
 
   // Face 3 (droite)
   beginShape(TRIANGLES);
@@ -161,6 +224,7 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
   vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
 
+<<<<<<< HEAD
   // Face pour l'entrée : 
   
     // Entrée droite (quad)
@@ -217,6 +281,8 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
     }
 
   // ========= FACE 4 =======
+=======
+>>>>>>> parent of 4220c78 (Structure code)
 
   // Face 4 (gauche)
   beginShape(TRIANGLES);
@@ -225,6 +291,8 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
   vertex(baseSize/2 * (1-t), baseSize/2 * (1-t), 0, 20, 0);
   vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
   endShape();
+
+
 
   // Face 4 (gauche toit)
   beginShape(TRIANGLES);

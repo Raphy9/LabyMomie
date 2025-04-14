@@ -1,5 +1,3 @@
-// =================================== Escalier et animation de changement d'etage ==============================
-
 // Fonction pour gérer la montée/descente des escaliers
 void gererEscaliers() {
   // Vérifier si le joueur est sur un escalier montant

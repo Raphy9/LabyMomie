@@ -1,4 +1,4 @@
-// Variables pour la position et le déplacement de la momie
+// ============= Variables pour la position et le déplacement de la momie =================
 float mummyPosX = 3.0;  // Position X initiale de la momie dans le labyrinthe (en réalité cette valeur n'est jamais utilisée mais permet de la placer à l'entrée du labyrinthe)
 float mummyPosY = 3.0;  // Position Y initiale de la momie dans le labyrinthe (même remarque qu'en haut)
 float mummyPosZ = 0.0;   // Position Z initiale de la momie (niveau 0 de la pyramide)
@@ -11,7 +11,7 @@ int mummyMoveInterval = 40; // Intervalle pour changer de direction
 //var pr la pos de la momie
 PVector mummyPos = new PVector(-688, 300, -1100);
 
-
+// ====== Initialise la position de la momie ==========
 void initMummyPosition() {
   // On essaie plusieurs positions jusqu'à en trouver une valide.
   for (int i = 6; i < LAB_SIZES[0] - 1; i++) {
@@ -30,6 +30,7 @@ void initMummyPosition() {
 
 }
 
+// ============== Verifie que la position pour la momie est valide ==============
 boolean isValidMummyPosition(float x, float y, int niveau) {
   int cellX = int(x - DECALAGES[niveau]);
   int cellY = int(y - DECALAGES[niveau]);
@@ -52,7 +53,7 @@ boolean isValidMummyPosition(float x, float y, int niveau) {
     return false;
   }
 
-  // On vérifie pour finir les cellules adjacentes pour s'assurer qu'il y a de l'espace pour se déplacer
+  // On vérifie les cellules adjacentes pour s'assurer qu'il y a de l'espace pour se déplacer
   int spaceCount = 0;
   if (cellX > 0 && labyrinthes[niveau][cellY][cellX-1] != '#') spaceCount++;
   if (cellX < LAB_SIZES[niveau]-1 && labyrinthes[niveau][cellY][cellX+1] != '#') spaceCount++;
@@ -63,6 +64,7 @@ boolean isValidMummyPosition(float x, float y, int niveau) {
   return spaceCount >= 2;
 }
 
+// ============== Verifie si la momie ets dehors =================
 boolean checkIfMummyOutside() {
   int cellX = int(mummyPosX - DECALAGES[mummyNiveau]);
   int cellY = int(mummyPosY - DECALAGES[mummyNiveau]);
@@ -83,30 +85,25 @@ boolean checkIfMummyOutside() {
   return false;
 }
 
+// ============== Dessine la momie ===============
 void renderMummy() {
   rotateX(-PI/2);
-  // Ne générer la momie que si elle est à l'intérieur du labyrinthe !
+  // On genere la momie seulement si elle est à l'intérieur du labyrinthe !!!
   if (checkIfMummyOutside()) {
     return;
   }
 
   pushMatrix();
-
-  // Utiliser la position de la momie dans le labyrinthe
   // On convertit les coordonnées du labyrinthe en coordonnées 3D
-  float mummyWorldX = (mummyPosX) * 20; // 20 unités par cellule
+  float mummyWorldX = (mummyPosX) * 20;
   float mummyWorldY = (mummyPosY) * 20;
   float mummyWorldZ = HAUTEURS_NIVEAUX[mummyNiveau] + 0; // Hauteur du niveau + décalage
-
   translate(mummyWorldX, mummyWorldZ, mummyWorldY);
 
   // Permet d'orienter la momie dans la direction de son déplacement
   float angle = atan2(mummyDirY, mummyDirX);
   rotateY(PI/2 - angle);
-
-  // Ajuster l'échelle pour réduire la taille de la momie
   scale(0.065);
-
 
   // Animation des bras
   armAnim = (sin(frameCount * 0.05) + 1) / 2;
@@ -135,14 +132,14 @@ void renderMummy() {
   //updateParticles();
   //displayParticles();
   popMatrix();
-}
+} 
 
-// Fonction pour mettre à jour la position de la momie de manière autonome
+// ===== Met à jour la position de la momie automatioquement =======
 void updateMummy() {
   // Mise à jour du timer pour changer de direction
   mummyMoveTimer++;
   if (mummyMoveTimer >= mummyMoveInterval) {
-    // Changer de direction aléatoirement
+    // On chnage de direction aléatoirement
     float angle = random(TWO_PI);
     mummyDirX = cos(angle);
     mummyDirY = sin(angle);
@@ -180,9 +177,9 @@ void updateMummy() {
     }
   } else {
     // Vérification plus précise pour éviter de traverser les murs
-    float margin = 0.3; // Marge pour éviter de traverser les murs
+    float margin = 0.3; // On se laisse une marge pour éviter de traverser les murs
 
-    // Vérifier les cellules adjacentes
+    // Vérification des cellules adjacentes
     if (newMummyPosX - (cellX + DECALAGES[mummyNiveau]) < margin &&
       cellX > 0 && labyrinthes[mummyNiveau][cellY][cellX-1] == '#')
       canMove = false;
@@ -221,6 +218,7 @@ void updateMummy() {
   mummyPos.set(mummyPosX * 20, mummyPosY * 20, HAUTEURS_NIVEAUX[mummyNiveau]);
 }
 
+// ============== Dessine la momie du RDC ===============
 void renderRDCMummy() {
   // Sauvegarder l'état actuel de la matrice
   pushMatrix();
@@ -237,6 +235,7 @@ void renderRDCMummy() {
   popMatrix();
 }
 
+// ============== Dessine la momie ===============
 void renderRDCMummyAt(int niveau) {
   Momie momie = momies[niveau];
   if (momie == null) return;
@@ -249,18 +248,14 @@ void renderRDCMummyAt(int niveau) {
   pushMatrix();
 
   // Utiliser la position de la momie dans le labyrinthe
-  // On convertit les coordonnées du labyrinthe en coordonnées 3D
-  float mummyWorldX = (momie.posX) * 20; // 20 unités par cellule
+  float mummyWorldX = (momie.posX) * 20;
   float mummyWorldY = (momie.posY) * 20;
-  float mummyWorldZ = HAUTEURS_NIVEAUX[niveau] + 0; // Hauteur du niveau + décalage
-
+  float mummyWorldZ = HAUTEURS_NIVEAUX[niveau] + 0;
   translate(mummyWorldX, mummyWorldZ, mummyWorldY);
 
   // Permet d'orienter la momie dans la direction de son déplacement
   float angle = atan2(momie.dirY, momie.dirX);
   rotateY(PI/2 - angle);
-
-  // Ajuster l'échelle pour réduire la taille de la momie
   scale(0.065);
 
   // Animation des bras
@@ -285,7 +280,7 @@ void renderRDCMummyAt(int niveau) {
   popMatrix();
 }
 
-// Dessine la momie du rez de chaussée sur la minimap (car après on les cache pour complexifier le jeu).
+// ============== Dessine la momie du rez de chaussée sur la minimap ===============
 void drawRDCMummyOnMiniMap(int mapX, int mapY, int cellSize) {
   if (momies[niveauActuel] != null) {
     Momie momie = momies[niveauActuel];

@@ -1,4 +1,4 @@
-// Crée un PShape de torche
+// ========== Crée un PShape de torche =============
 PShape createTorch3D() {
   PShape torch = createShape(GROUP);
   
@@ -16,7 +16,7 @@ PShape createTorch3D() {
   handle.setStroke(false);
   torch.addChild(handle);
 
-  // 2) Collier (anneau) près du sommet
+  // 2) Bout de la torche
   PVector[] ringProfile = {
     new PVector(4, 120),  // Doit coller à la fin du manche
     new PVector(6, 125),  // Légèrement plus large
@@ -32,7 +32,7 @@ PShape createTorch3D() {
   return torch;
 }
 
-// Update les flammes de la torche
+// ==== Update les flammes de la torche =====
 void updateAndRenderFlame() {
   pushMatrix();
   for (Particle p : flameParticles) {
@@ -42,6 +42,7 @@ void updateAndRenderFlame() {
   popMatrix();
 }
 
+// ======== Constructeur pour les formes de la torche ============
 PShape revolveShape(PVector[] profile, int revolveDetail) {
   PShape shape3D = createShape();
   shape3D.beginShape(QUADS);
@@ -97,10 +98,10 @@ PShape revolveShape(PVector[] profile, int revolveDetail) {
  */
 PShape createFlamme3D() {
   PShape flameGroup = createShape(GROUP);
-  int numParticles = 800; // Nombre de particules que l'on souhaite générer
+  int numParticles = 800; // Nombre de particules
   
   for (int i = 0; i < numParticles; i++) {
-    float particleSize = random(1, 3); // Taille aléatoire pour la particule
+    float particleSize = random(1, 3);
     PShape particle = createShape(SPHERE, particleSize);
     
     // couleur et transparence

@@ -11,47 +11,8 @@ float rGlobal = 30.0;     // Rayon de base
 // Animation Momie
 float armAnim = 0;
 
-//========
 
-PShape buildArm() {
-  int armSegments = 40; // Nombre de segments le long du bras
-  float armBase = 15; // Rayon de départ (au niveau de l'épaule)
-  float armTip = 10; // Rayon à l'extrémité du bras
-  float stepArm = 2.5; // Écart entre les segments le long du bras
-
-  PShape armGroup = createShape(GROUP);
-
-  for (int b = 0; b < numBands; b++) {
-    float globalOffset = TWO_PI * b / numBands;
-    PShape armBand = createShape();
-    armBand.beginShape(QUAD_STRIP);
-    armBand.noStroke();
-    for (int i = 0; i <= armSegments; i++) {
-      float t = map(i, 0, armSegments, 0, 1);
-      float rArm = lerp(armBase, armTip, t);
-      float angle = i * angleStep + globalOffset;
-      float pos = i * stepArm;
-
-      float x1 = pos;
-      float y1 = rArm * cos(angle);
-      float z1 = rArm * sin(angle);
-
-      float x2 = pos;
-      float y2 = rArm * cos(angle + bandOffset);
-      float z2 = rArm * sin(angle + bandOffset);
-
-      float c = map(noise(i * 0.1 + b), 0, 1, 200, 255);
-      armBand.fill(c, c * 0.75, c * 0.5);
-
-      armBand.vertex(x1, y1, z1);
-      armBand.vertex(x2, y2, z2);
-    }
-    armBand.endShape();
-    armGroup.addChild(armBand);
-  }
-  return armGroup;
-}
-
+// ======== Construction de la momie ============
 PShape createMummy() {
   PShape mummyGroup = createShape(GROUP);
   mummyGroup.setName("mummyGroup");
@@ -175,4 +136,45 @@ PShape createMummy() {
   mummyGroup.addChild(armsGroup);
 
   return mummyGroup;
+}
+
+// ======== Construction des bras ============
+
+PShape buildArm() {
+  int armSegments = 40; // Nombre de segments le long du bras
+  float armBase = 15; // Rayon de départ (au niveau de l'épaule)
+  float armTip = 10; // Rayon à l'extrémité du bras
+  float stepArm = 2.5; // Écart entre les segments le long du bras
+
+  PShape armGroup = createShape(GROUP);
+
+  for (int b = 0; b < numBands; b++) {
+    float globalOffset = TWO_PI * b / numBands;
+    PShape armBand = createShape();
+    armBand.beginShape(QUAD_STRIP);
+    armBand.noStroke();
+    for (int i = 0; i <= armSegments; i++) {
+      float t = map(i, 0, armSegments, 0, 1);
+      float rArm = lerp(armBase, armTip, t);
+      float angle = i * angleStep + globalOffset;
+      float pos = i * stepArm;
+
+      float x1 = pos;
+      float y1 = rArm * cos(angle);
+      float z1 = rArm * sin(angle);
+
+      float x2 = pos;
+      float y2 = rArm * cos(angle + bandOffset);
+      float z2 = rArm * sin(angle + bandOffset);
+
+      float c = map(noise(i * 0.1 + b), 0, 1, 200, 255);
+      armBand.fill(c, c * 0.75, c * 0.5);
+
+      armBand.vertex(x1, y1, z1);
+      armBand.vertex(x2, y2, z2);
+    }
+    armBand.endShape();
+    armGroup.addChild(armBand);
+  }
+  return armGroup;
 }

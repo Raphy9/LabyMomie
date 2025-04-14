@@ -1,4 +1,4 @@
-// Quelques constantes de réglages pour les étages de la pyramide
+// ======= Variables pour niveau ============
 final int NIVEAUX = 10;
 final int[] LAB_SIZES = {21, 19, 17, 15, 13, 11, 9, 7, 5, 3};
 // Attention, un mur fait 20 unités de hauteur !
@@ -23,6 +23,7 @@ void initLevelLaby() {
   }
 }
 
+// ======= Genere un Laby ========
 void genererLabyrinthe(int niveau) {
   int labSize = LAB_SIZES[niveau];
 
@@ -59,21 +60,15 @@ void genererLabyrinthe(int niveau) {
     }
   }
 
-  // Entrée et sortie du labyrinthe
   // Entrée et sortie du labyrinthe (uniquement pour le niveau 0)
   if (niveau == 0) {
-    // On ouvre l'entrée sur la face extérieure
     labyrinthes[niveau][0][1] = ' ';
-    // On ouvre aussi la « sortie »
     labyrinthes[niveau][labSize - 2][labSize - 1] = ' ';
   } else {
     // Pour les niveaux supérieurs, on bouche l'emplacement qui servait d'entrée
     labyrinthes[niveau][0][1] = '#';
-    // éventuellement on laisse la « sortie » du côté que tu veux
-    // labyrinthes[niveau][labSize - 2][labSize - 1] = ' ';
   }
-
-  // On positionne des escaliers (à côté de la sortie)
+  // On positionne des escaliers à côté de la sortie
   if (niveau < NIVEAUX - 1) {
     labyrinthes[niveau][labSize-2][labSize-2] = 'E'; // Escalier montant
   }
@@ -107,7 +102,7 @@ void genererLabyrinthe(int niveau) {
 }
 
 
-
+// ======== Construction du Niveau ============
 PShape genererShapeNiveau(int niveau) {
   // Création d'un groupe global pour le niveau
   PShape niveauShape = createShape(GROUP);

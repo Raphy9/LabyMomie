@@ -1,3 +1,6 @@
+ArrayList<Particle> flameParticles;
+
+// ========== Structure pour les particules de feu ===========
 class Particle {
   PVector basePos;
   float size;
@@ -30,8 +33,7 @@ class Particle {
   }
 }
 
-ArrayList<Particle> flameParticles;
-
+// ========== Genere des particules de flammezs pour la torche ================
 void genererFlammeParticules() {
   // Génération des particules de la flamme
   flameParticles = new ArrayList<Particle>();

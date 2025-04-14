@@ -252,6 +252,9 @@ void checkMummyCollisionAt(int niveau) {
       }
     }
     currentState = 0;
+    targetPosX = 1.4;
+    targetPosY = 1.0;
+    targetPosZ = HAUTEURS_NIVEAUX[0];
     posX = 1.4;
     posY = 1.0;
     posZ = HAUTEURS_NIVEAUX[0];

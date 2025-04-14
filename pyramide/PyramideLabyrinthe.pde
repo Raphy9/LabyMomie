@@ -10,7 +10,7 @@ SoundFile button;
 int revealDistance = 40;
 
 ArrayList<PShape> niveauxShapes = new ArrayList<PShape>();
-int NIVEAUACTUEL =0;
+  int NIVEAUACTUEL =0;
 
 char[][][] labyrinthes;
 char[][][][] sides;

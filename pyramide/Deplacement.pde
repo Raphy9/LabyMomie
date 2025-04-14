@@ -278,7 +278,7 @@ void keyPressed() {
     isKeyRightPressed = true;
   } else if (key == 'e' || key == 'E') {
     int cellX = int(posX - DECALAGES[niveauActuel]);
-    int cellY = int(posY - DECALAGES[niveauActuel]);
+    int cellY = int(posY - DECALAGES[niveauActuel]);  
 
     if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] &&
       cellY >= 0 && cellY < LAB_SIZES[niveauActuel] &&
@@ -286,7 +286,6 @@ void keyPressed() {
       niveauActuel < NIVEAUX - 1) {
 
       animerMonteeDescente(niveauActuel + 1, 1 + DECALAGES[niveauActuel + 1], 1 + DECALAGES[niveauActuel + 1]);
-      NIVEAUACTUEL++;
     }
   } else if (key == 'd' || key == 'D') {
     int cellX = int(posX - DECALAGES[niveauActuel]);
@@ -299,7 +298,6 @@ void keyPressed() {
 
       animerMonteeDescente(niveauActuel - 1, (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1],
         (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1]);
-      NIVEAUACTUEL--;
     }
   }
 }

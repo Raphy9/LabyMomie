@@ -19,18 +19,37 @@ PImage createTextureJaune(PImage original) {
   return result;
 }
 
+// Affiche les 3 faces lisses des pyramides
+void renderPyramide() {
+  // Pyramide d'origine (existante)
+  pushMatrix();
+  translate(0, 0, -1);
+  shape(niveauxShapes.get(NIVEAUACTUEL));
+  renderPyramideLisseExterieure(300, 21, 20, false);
+  popMatrix();
+
+  // Deuxième pyramide (à gauche)
+  pushMatrix();
+  translate(550, -229, -5);
+  renderPyramideLisseExterieure(220, 18, 17, true);
+  popMatrix();
+
+  // 3e pyramide (à droite)
+  pushMatrix();
+  translate(-420, +229, -50);
+  renderPyramideLisseExterieure(240, 16, 20, true);
+  popMatrix();
+}
+
+// Affiche la face lisse d'une pyramide
 void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites, boolean onBouche) {
-  // Taille de base : la pyramide la plus large fait 21 cases × 20 unités = 420
   float baseSize = nbCases * nbUnites;
-  // On place le sommet à 300 en Z
   float apexZ = hauteurSommet;
 
   pushMatrix();
   noStroke();
-
   textureWrap(REPEAT);
   float t = -apexZ / (20 - apexZ);
-
 
   // Face 1 (devant toit)
   beginShape(TRIANGLES);
@@ -39,7 +58,6 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
   vertex(baseSize - (baseSize/2) * ((apexZ - 60) / (apexZ - 20)), (baseSize/2) * ((apexZ - 60) / (apexZ - 20)), apexZ-40, 20, 0);
   vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
-
 
   // Face 1 (devant)
   beginShape(TRIANGLES);
@@ -104,8 +122,6 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
     endShape(QUADS);
   }
 
-
-
   // Face 2 (arrière)
   beginShape(TRIANGLES);
   texture(textureStoneJaune);
@@ -121,8 +137,6 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
   vertex(baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)), baseSize - (baseSize/2) * ((apexZ - 60)/(apexZ - 20)), apexZ-40, 20, 0);
   vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
-
-
 
   // Face 3 (droite)
   beginShape(TRIANGLES);
@@ -194,7 +208,6 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
   vertex(baseSize/2, baseSize/2, apexZ+1, 10, 20);
   endShape();
 
-
   // Face 4 (gauche)
   beginShape(TRIANGLES);
   texture(textureStoneJaune);
@@ -202,8 +215,6 @@ void renderPyramideLisseExterieure(int hauteurSommet, int nbCases, int nbUnites,
   vertex(baseSize/2 * (1-t), baseSize/2 * (1-t), 0, 20, 0);
   vertex(baseSize/2, baseSize/2, apexZ, 10, 20);
   endShape();
-
-
 
   // Face 4 (gauche toit)
   beginShape(TRIANGLES);

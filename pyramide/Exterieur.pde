@@ -1,8 +1,25 @@
+// ======= Variables ========
 float[][] hauteursSol;
 int TAILLE_DESERT = 350;
-
 PShader sandstormShader;
 
+// ============= Boolean Exterieur ===================
+boolean checkSiExterieur() {
+  int labSize = LAB_SIZES[niveauActuel];
+  int decalage = DECALAGES[niveauActuel];
+
+  // Si le joueur est en dehors des limites du labyrinthe actuel
+  if (posX < decalage || posX >= labSize + decalage ||
+    posY < decalage || posY >= labSize + decalage) {
+    return true;
+  }
+
+  return false;
+}
+
+// ==================================== Ciel ==================================
+
+// ==== Initialise la texture de ciel ====
 PImage createTextureCiel() {
   PImage result = createImage(512, 512, RGB);
   result.loadPixels();
@@ -31,82 +48,7 @@ PImage createTextureCiel() {
   return result;
 }
 
-void initSandstormShader() {
-  sandstormShader = loadShader("sandstormFragment.glsl", "sandstormVertex.glsl");
-
-  // Initialisation des paramètres du shader
-  sandstormShader.set("resolution", float(width), float(height));
-  sandstormShader.set("windDirection", 0.8, 0.2);
-  sandstormShader.set("windStrength", 1.5);
-}
-
-void updateSandstormShader() {
-  // Mise à jour du temps pour l'animation
-  sandstormShader.set("time", time);
-
-  // Variation de la force du vent avec le temps pour un effet plus naturel
-  // Amplitude augmentée pour des pics plus intenses
-  float windVariation = sin(time * 0.1) * 1.0 + 1.2; // Valeur de base plus élevée avec forte amplitude
-
-  // Assurer que la force du vent tombe à presque zéro à certains moments
-  // pour que le sable disparaisse complètement
-  if (sin(time * 0.1) < -0.8) {
-    windVariation = 0.2; // Force minimale qui fait disparaître l'effet
-  }
-
-  sandstormShader.set("windStrength", windVariation);
-
-  // Variation légère de la direction du vent
-  float windDirX = 0.8 + sin(time * 2) * 0.01;
-  float windDirY = 0.2 + cos(time * 2) * 0.15;
-  sandstormShader.set("windDirection", windDirX, windDirY);
-}
-
-// Fonction pour obtenir la hauteur du terrain à une position donnée
-float getTerrainHeight(float x, float y) {
-  // On convertit les coordonnées du joueur en indices pour le tableau hauteursSol
-  // On doit tenir compte du décalage du terrain (-TAILLE_DESERT*10, -TAILLE_DESERT*10)
-  // et de l'échelle (20 unités par case)
-
-  int i = int((x * 20 + TAILLE_DESERT * 10) / 20);
-  int j = int((y * 20 + TAILLE_DESERT * 10) / 20);
-
-  // On vérifie que les indices sont valides.
-  if (i < 0) i = 0;
-  if (i >= TAILLE_DESERT - 1) i = TAILLE_DESERT - 2;
-  if (j < 0) j = 0;
-  if (j >= TAILLE_DESERT - 1) j = TAILLE_DESERT - 2;
-
-  float fracX = ((x * 20 + TAILLE_DESERT * 10) / 20) - i;
-  float fracY = ((y * 20 + TAILLE_DESERT * 10) / 20) - j;
-
-  // On réalise une interpolation pour obtenir une hauteur lisse
-  float h1 = hauteursSol[i][j];
-  float h2 = hauteursSol[i+1][j];
-  float h3 = hauteursSol[i][j+1];
-  float h4 = hauteursSol[i+1][j+1];
-
-  // Interpolation en x pour les deux paires de points
-  float hA = lerp(h1, h2, fracX);
-  float hB = lerp(h3, h4, fracX);
-
-  // Interpolation en y entre les résultats précédents
-  float height = lerp(hA, hB, fracY);
-
-  return height;
-}
-
-void genererSolDesertique() {
-  hauteursSol = new float[TAILLE_DESERT][TAILLE_DESERT];
-
-  for (int i = 0; i < TAILLE_DESERT; i++) {
-    for (int j = 0; j < TAILLE_DESERT; j++) {
-      // On utilise ici du 'bruit' pour moduler la hauteur
-      hauteursSol[i][j] = map(noise(i/40.0, j/40.0), 0, 1, -26, 26);
-    }
-  }
-}
-
+// ===== Effectue le rendu du ciel ======= 
 void renderCiel() {
   pushMatrix();
 
@@ -161,12 +103,59 @@ void renderCiel() {
   popMatrix();
 }
 
+// ============================= Shader de tempete de sable ==========================
+
+// ==== Initialise le shader de tempete de sable ====
+void initSandstormShader() {
+  sandstormShader = loadShader("sandstormFragment.glsl", "sandstormVertex.glsl");
+
+  // Initialisation des paramètres du shader
+  sandstormShader.set("resolution", float(width), float(height));
+  sandstormShader.set("windDirection", 0.8, 0.2);
+  sandstormShader.set("windStrength", 1.5);
+}
+
+// ==== Update le shader de tempete de sable ====
+void updateSandstormShader() {
+  // Mise à jour du temps pour l'animation
+  sandstormShader.set("time", time);
+
+  // Variation de la force du vent avec le temps pour un effet plus naturel
+  // Amplitude augmentée pour des pics plus intenses
+  float windVariation = sin(time * 0.1) * 1.0 + 1.2; // Valeur de base plus élevée avec forte amplitude
+
+  // Assurer que la force du vent tombe à presque zéro à certains moments
+  // pour que le sable disparaisse complètement
+  if (sin(time * 0.1) < -0.8) {
+    windVariation = 0.2; // Force minimale qui fait disparaître l'effet
+  }
+
+  sandstormShader.set("windStrength", windVariation);
+
+  // Variation légère de la direction du vent
+  float windDirX = 0.8 + sin(time * 2) * 0.01;
+  float windDirY = 0.2 + cos(time * 2) * 0.15;
+  sandstormShader.set("windDirection", windDirX, windDirY);
+}
+
+// ==== Applique le shader de tempete de sable ====
 void applySandstormEffect() {
   updateSandstormShader();
 
   filter(sandstormShader);
 }
 
+// ============================= Sol Desertique et Terrain =====================
+
+// ==== Gere les rendus du sol desertique ====
+void gestionRenderSol() {
+  if (estExterieur) {
+    genererSolDesertique();
+    renderSolDesertique(true);
+  }
+}
+
+// ==== Effectue le rendu du sol desertique ====
 void renderSolDesertique(boolean light) {
   pushMatrix();
   // Positionner le sol en dessous de la pyramide
@@ -190,23 +179,48 @@ void renderSolDesertique(boolean light) {
   popMatrix();
 }
 
-void gestionRenderSol() {
-  if (estExterieur) {
-    genererSolDesertique();
-    renderSolDesertique(true);
+// ==== Genere le sol désertique ====
+void genererSolDesertique() {
+  hauteursSol = new float[TAILLE_DESERT][TAILLE_DESERT];
+
+  for (int i = 0; i < TAILLE_DESERT; i++) {
+    for (int j = 0; j < TAILLE_DESERT; j++) {
+      // On utilise ici du 'bruit' pour moduler la hauteur
+      hauteursSol[i][j] = map(noise(i/40.0, j/40.0), 0, 1, -26, 26);
+    }
   }
 }
 
-// Fonction pour vérifier si le joueur est à l'extérieur de la pyramide
-boolean checkSiExterieur() {
-  int labSize = LAB_SIZES[niveauActuel];
-  int decalage = DECALAGES[niveauActuel];
+// ==== Donne la hauteur du terrain à une position donnée ====
+float getTerrainHeight(float x, float y) {
+  // On convertit les coordonnées du joueur en indices pour le tableau hauteursSol
+  // On doit tenir compte du décalage du terrain (-TAILLE_DESERT*10, -TAILLE_DESERT*10)
+  // et de l'échelle (20 unités par case)
 
-  // Si le joueur est en dehors des limites du labyrinthe actuel
-  if (posX < decalage || posX >= labSize + decalage ||
-    posY < decalage || posY >= labSize + decalage) {
-    return true;
-  }
+  int i = int((x * 20 + TAILLE_DESERT * 10) / 20);
+  int j = int((y * 20 + TAILLE_DESERT * 10) / 20);
 
-  return false;
+  // On vérifie que les indices sont valides.
+  if (i < 0) i = 0;
+  if (i >= TAILLE_DESERT - 1) i = TAILLE_DESERT - 2;
+  if (j < 0) j = 0;
+  if (j >= TAILLE_DESERT - 1) j = TAILLE_DESERT - 2;
+
+  float fracX = ((x * 20 + TAILLE_DESERT * 10) / 20) - i;
+  float fracY = ((y * 20 + TAILLE_DESERT * 10) / 20) - j;
+
+  // On réalise une interpolation pour obtenir une hauteur lisse
+  float h1 = hauteursSol[i][j];
+  float h2 = hauteursSol[i+1][j];
+  float h3 = hauteursSol[i][j+1];
+  float h4 = hauteursSol[i+1][j+1];
+
+  // Interpolation en x pour les deux paires de points
+  float hA = lerp(h1, h2, fracX);
+  float hB = lerp(h3, h4, fracX);
+
+  // Interpolation en y entre les résultats précédents
+  float height = lerp(hA, hB, fracY);
+
+  return height;
 }

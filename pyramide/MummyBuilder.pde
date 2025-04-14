@@ -1,3 +1,18 @@
+//==============REGLAGES MOMIE======================
+PShape mummyGroup;  // Le groupe global de la momie
+
+// Paramètres généraux (corps, tête, etc.)
+int numBands   = 5;       // Nombre de bandes spirales
+float angleStep = 0.8;    // Incrément d'angle par anneau
+float bandOffset = 5.0;   // Décalage en angle pour l'épaisseur des bandes
+float stepHeight = 3.0;   // Écart vertical entre les anneaux (hauteur)
+float rGlobal = 30.0;     // Rayon de base
+
+// Animation Momie
+float armAnim = 0;
+
+//========
+
 PShape buildArm() {
   int armSegments = 40; // Nombre de segments le long du bras
   float armBase = 15; // Rayon de départ (au niveau de l'épaule)

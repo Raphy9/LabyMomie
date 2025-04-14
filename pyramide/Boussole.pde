@@ -1,6 +1,10 @@
+// ===== Variables =====
 float compassRadius = 150;
 float compassThickness = 40;
 
+// =================================== Création de notre boussole ==============================
+
+// Affiche la boussole
 void drawCompass() {
   // On réinitialise la caméra et la perspective pour l'affichage 2D
   camera();
@@ -22,10 +26,11 @@ void drawCompass() {
   popMatrix();
 }
 
+// Affiche le socle de la boussole
 void drawCompassBody(float radius, float thickness) {
   int nbSteps = 60; // Nombre de segments pour faire le tour du cylindre
   float angleStep = TWO_PI / nbSteps;
-  float halfH = thickness/2.0; // Moitié de l’épaisseur (pour dessiner de -halfH à +halfH)
+  float halfH = thickness/2.0; // Moitié de l'épaisseur (pour dessiner de -halfH à +halfH)
 
   translate(-width*1.42, height*1.25, 0);
   fill(150, 100, 50);
@@ -56,9 +61,8 @@ void drawCompassBody(float radius, float thickness) {
   endShape();
 }
 
-// Pour dessiner la face supérieure.
+// Affiche le cadran de la boussole
 void drawCompassFace(float radius) {
-  // Dessin du disque supérieur (cadran)
   noStroke();
   fill(232, 216, 178);
   circle3D(radius);
@@ -71,7 +75,8 @@ void drawCompassFace(float radius) {
   pushMatrix();
   translate(0, 0, -1);
 
-  // --- Points cardinaux (N, E, S, O) plus petits à l'intérieur ---
+  // --- Points cardinaux (N, E, S, O) ---
+  
   pushMatrix();
   textAlign(CENTER, CENTER);
   textSize(25);
@@ -105,22 +110,20 @@ void drawCompassFace(float radius) {
 
   // Rotation des aiguilles en fonction de l'orientation du joueur
   pushMatrix();
-  // Remarque : les aiguilles doivent tourner dans le sens inverse du joueur pour indiquer le nord correctement
   float angleNorth = -currentAngle;
   rotate(angleNorth);
-
-  // Aiguille Nord (rouge)
-  drawNeedle(radius * 0.52, 8, color(200, 0, 0));
-
-  // Aiguille Sud (bleue)
+  drawNeedle(radius * 0.52, 8, color(200, 0, 0)); // Aiguille Nord (rouge)
+  
   pushMatrix();
   rotate(PI);
-  drawNeedle(radius * 0.52, 8, color(0, 0, 200));
+  drawNeedle(radius * 0.52, 8, color(0, 0, 200)); // Aiguille Sud (bleue)
   popMatrix();
+  
   popMatrix();
-
   popMatrix();
 }
+
+// =================================== Fonction pour notre boussole ==============================
 
 /**
  * Dessine un disque à plat dans le plan XY (Z=0) de rayon r.
@@ -140,17 +143,16 @@ void circle3D(float r) {
   endShape();
 }
 
+// Dessine une aiguille pour la boussole
 void drawNeedle(float length, float baseHalfWidth, color col) {
   noStroke();
   fill(col);
+  
   beginShape();
-  // Coin de gauche à la base
-  vertex(-baseHalfWidth, 0, 0);
-  // Pointe, fine
-  vertex(-2, -length, 0);
-  vertex(2, -length, 0);
-  // Coin de droite à la base
-  vertex(baseHalfWidth, 0, 0);
+    vertex(-baseHalfWidth, 0, 0);
+    vertex(-2, -length, 0);
+    vertex(2, -length, 0);
+    vertex(baseHalfWidth, 0, 0);
   endShape(CLOSE);
 }
 

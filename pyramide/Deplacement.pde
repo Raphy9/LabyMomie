@@ -1,12 +1,17 @@
-float currentAngle;   // En radians
-float targetAngle= PI/2;
-float rotationStep = PI / 30; // Incrément de rotation par frame (ici 1° par appel)
+//  ==== Variable pour les rotations ====
+float currentAngle;
+float targetAngle = PI/2;
+float rotationStep = PI / 30; // Incrément de rotation par frame
 
+// ==== Variable pour le clavier ====
 boolean isKeyUpPressed = false;
 boolean isKeyDownPressed = false;
 boolean isKeyLeftPressed = false;
 boolean isKeyRightPressed = false;
 
+// =================================== Déplacement et rotation ==============================
+
+// Gere les déplacements
 void gestionDeplacements() {
   if (isKeyLeftPressed) {
     rotateLeft();
@@ -28,73 +33,17 @@ void gestionDeplacements() {
   }
 }
 
-void updateRotationAnimation() {
-  float smoothing = 0.2;
-  float diff = targetAngle - currentAngle;
-
-  // On normalise la différence pour éviter de tourner dans le mauvais sens (entre -PI et PI)
-  if (diff > PI) {
-    diff -= 2 * PI;
-  } else if (diff < -PI) {
-    diff += 2 * PI;
-  }
-
-  if (abs(diff) < 0.001) {
-    currentAngle = targetAngle;
-  } else {
-    currentAngle += diff * smoothing;
-  }
-
-  dirX = cos(currentAngle);
-  dirY = sin(currentAngle);
-}
-
-void revelerZoneAutourDuJoueur() {
-  int px = int(posX - DECALAGES[niveauActuel]);
-  int py = int(posY - DECALAGES[niveauActuel]);
-
-  int rayon = 3;
-
-  for (int y = py - rayon; y <= py + rayon; y++) {
-    for (int x = px - rayon; x <= px + rayon; x++) {
-      if (x >= 0 && x < LAB_SIZES[niveauActuel] &&
-        y >= 0 && y < LAB_SIZES[niveauActuel]) {
-        float dist = dist(px, py, x, y);
-        if (dist <= rayon) {
-          decouvert[niveauActuel][y][x] = true;
-        }
-      }
-    }
-  }
-}
-
-void keyReleased() {
-  // Pour les touches directionnelles
-  if (keyCode == 37) {
-    isKeyLeftPressed = false;
-  } else if (keyCode == 39) {
-    isKeyRightPressed = false;
-  }
-  if (keyCode == 38) {
-    isKeyUpPressed = false;
-  } else if (keyCode == 40) {
-    isKeyDownPressed = false;
-  }
-  if (keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 37) {
-    isMoving = false;
-    animationTimer = 0;
-    deplacerJoueur(targetPosX, targetPosY);
-  }
-}
-
+// rotation gauche
 void rotateLeft() {
   targetAngle -= rotationStep;
 }
 
+// rotation droite
 void rotateRight() {
   targetAngle += rotationStep;
 }
 
+// avancer
 void moveForward() {
   if (anim > 0) return;
   float newPosX = posX + dirX * 0.6;
@@ -102,6 +51,7 @@ void moveForward() {
   deplacerJoueur(newPosX, newPosY);
 }
 
+// reculer
 void moveBackward() {
   if (anim > 0) return;
   float newPosX = posX - dirX * 0.6;
@@ -109,6 +59,7 @@ void moveBackward() {
   deplacerJoueur(newPosX, newPosY);
 }
 
+// Fonction de deplacement du joueur
 void deplacerJoueur(float newPosX, float newPosY) {
   oldPosX = posX;
   oldPosY = posY;
@@ -179,14 +130,131 @@ void deplacerJoueur(float newPosX, float newPosY) {
   isMoving = true;
 }
 
+// Fonction permettant d'update la rotation
+void updateRotationAnimation() {
+  float smoothing = 0.2;
+  float diff = targetAngle - currentAngle;
 
+  // On normalise la différence pour éviter de tourner dans le mauvais sens (entre -PI et PI)
+  if (diff > PI) {
+    diff -= 2 * PI;
+  } else if (diff < -PI) {
+    diff += 2 * PI;
+  }
+
+  if (abs(diff) < 0.001) {
+    currentAngle = targetAngle;
+  } else {
+    currentAngle += diff * smoothing;
+  }
+
+  dirX = cos(currentAngle);
+  dirY = sin(currentAngle);
+}
+
+// Fonction d'easing pour un mouvement plus naturel
+float easeInOutQuad(float t) {
+  if (t < 0.5) {
+    return 2 * t * t;
+  } else {
+    return -1 + (4 - 2 * t) * t;
+  }
+}
+
+// =================================== Detection de clavier ==============================
+
+// Detecte quand on enfonce une touche
+void keyPressed() {
+  if (anim > 0) return;
+
+  if (keyCode == 38) {
+    isKeyUpPressed = true;
+  } else if (keyCode == 40) {
+    isKeyDownPressed = true;
+  } else if (keyCode == 37) {
+    isKeyLeftPressed = true;
+  } else if (keyCode == 39) {
+    isKeyRightPressed = true;
+  } else if (key == 'e' || key == 'E') {
+    int cellX = int(posX - DECALAGES[niveauActuel]);
+    int cellY = int(posY - DECALAGES[niveauActuel]);
+
+    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] &&
+      cellY >= 0 && cellY < LAB_SIZES[niveauActuel] &&
+      labyrinthes[niveauActuel][cellY][cellX] == 'E' &&
+      niveauActuel < NIVEAUX - 1) {
+
+      animerMonteeDescente(niveauActuel + 1, 1 + DECALAGES[niveauActuel + 1], 1 + DECALAGES[niveauActuel + 1]);
+      NIVEAUACTUEL++;
+    }
+  } else if (key == 'd' || key == 'D') {
+    int cellX = int(posX - DECALAGES[niveauActuel]);
+    int cellY = int(posY - DECALAGES[niveauActuel]);
+
+    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] &&
+      cellY >= 0 && cellY < LAB_SIZES[niveauActuel] &&
+      labyrinthes[niveauActuel][cellY][cellX] == 'D' &&
+      niveauActuel > 0) {
+
+      animerMonteeDescente(niveauActuel - 1, (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1],
+        (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1]);
+      NIVEAUACTUEL--;
+    }
+  }
+}
+
+// Detecte les touches qu'on relache
+void keyReleased() {
+  // Pour les touches directionnelles
+  if (keyCode == 37) {
+    isKeyLeftPressed = false;
+  } else if (keyCode == 39) {
+    isKeyRightPressed = false;
+  }
+  if (keyCode == 38) {
+    isKeyUpPressed = false;
+  } else if (keyCode == 40) {
+    isKeyDownPressed = false;
+  }
+  if (keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 37) {
+    isMoving = false;
+    animationTimer = 0;
+    deplacerJoueur(targetPosX, targetPosY);
+  }
+}
+
+// =================================== Update de la Minimap ==============================
+
+// Permet de reveler la zone autour du Joueur
+void revelerZoneAutourDuJoueur() {
+  int px = int(posX - DECALAGES[niveauActuel]);
+  int py = int(posY - DECALAGES[niveauActuel]);
+
+  int rayon = 3;
+
+  for (int y = py - rayon; y <= py + rayon; y++) {
+    for (int x = px - rayon; x <= px + rayon; x++) {
+      if (x >= 0 && x < LAB_SIZES[niveauActuel] &&
+        y >= 0 && y < LAB_SIZES[niveauActuel]) {
+        float dist = dist(px, py, x, y);
+        if (dist <= rayon) {
+          decouvert[niveauActuel][y][x] = true;
+        }
+      }
+    }
+  }
+}
+
+// =================================== Joueur dans pyramide ==============================
+
+// Verifie si le joueur est dans la pyramide
 boolean estDansPyramide(float x, float y, float z, float baseX, float baseY, float baseSize, float hauteurSommet, float marge) {
-  // On commence par convertir les coordonnées du joueur en coordonnées relatives à la base de la pyramide
+  // Coordonnées du joueur, relatives à la base de la pyramide
   float relX = x * 20 - baseX;
   float relY = y * 20 - baseY;
   float relZ = z;
 
-  // On vérifie ici si le point est à l'intérieur de la base carrée de la pyramide (en prenant en compte la marge)
+  // On vérifie ici si le point est à l'intérieur de la base carrée de la pyramide avec une marge
   if (relX < -marge || relX > baseSize + marge || relY < -marge || relY > baseSize + marge) {
     return false;
   }
@@ -211,6 +279,8 @@ boolean estDansPyramide(float x, float y, float z, float baseX, float baseY, flo
   // Le point est dans la pyramide si sa hauteur est inférieure à la hauteur de la pyramide à ce point
   return relZ < hauteurPoint;
 }
+
+// =================================== Collision avec pyramide ==============================
 
 // Fonction pour vérifier si le joueur est en collision avec une pyramide extérieure
 boolean collisionAvecPyramideExterieure(float newPosX, float newPosY, float newPosZ) {
@@ -263,43 +333,4 @@ boolean collisionAvecPyramideExterieure(float newPosX, float newPosY, float newP
   }
 
   return false;
-}
-
-void keyPressed() {
-  if (anim > 0) return;
-
-  if (keyCode == 38) {
-    isKeyUpPressed = true;
-  } else if (keyCode == 40) {
-    isKeyDownPressed = true;
-  } else if (keyCode == 37) {
-    isKeyLeftPressed = true;
-  } else if (keyCode == 39) {
-    isKeyRightPressed = true;
-  } else if (key == 'e' || key == 'E') {
-    int cellX = int(posX - DECALAGES[niveauActuel]);
-    int cellY = int(posY - DECALAGES[niveauActuel]);
-
-    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] &&
-      cellY >= 0 && cellY < LAB_SIZES[niveauActuel] &&
-      labyrinthes[niveauActuel][cellY][cellX] == 'E' &&
-      niveauActuel < NIVEAUX - 1) {
-
-      animerMonteeDescente(niveauActuel + 1, 1 + DECALAGES[niveauActuel + 1], 1 + DECALAGES[niveauActuel + 1]);
-      NIVEAUACTUEL++;
-    }
-  } else if (key == 'd' || key == 'D') {
-    int cellX = int(posX - DECALAGES[niveauActuel]);
-    int cellY = int(posY - DECALAGES[niveauActuel]);
-
-    if (cellX >= 0 && cellX < LAB_SIZES[niveauActuel] &&
-      cellY >= 0 && cellY < LAB_SIZES[niveauActuel] &&
-      labyrinthes[niveauActuel][cellY][cellX] == 'D' &&
-      niveauActuel > 0) {
-
-      animerMonteeDescente(niveauActuel - 1, (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1],
-        (LAB_SIZES[niveauActuel - 1] - 2) + DECALAGES[niveauActuel - 1]);
-      NIVEAUACTUEL--;
-    }
-  }
 }

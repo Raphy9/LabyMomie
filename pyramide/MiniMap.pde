@@ -1,5 +1,18 @@
+// ==== Initialisation du brouillard de la minimap ====
+void initBrouillardMiniMap() {
+  for (int niv = 0; niv < NIVEAUX; niv++) {
+    decouvert[niv] = new boolean[LAB_SIZES[niv]][LAB_SIZES[niv]];
+    // Par défaut, tout est false => "non découvert"
+    for (int j = 0; j < LAB_SIZES[niv]; j++) {
+      for (int i = 0; i < LAB_SIZES[niv]; i++) {
+        decouvert[niv][j][i] = false;
+      }
+    }
+  }
+}
+
+// ==== Dessine la minimap ====
 void drawMiniMap() {
-  // On réinitialise la caméra et la perspective pour l'affichage 2D
   camera();
   perspective();
   hint(DISABLE_DEPTH_TEST);
@@ -60,8 +73,7 @@ void drawMiniMap() {
       }
     }
   }
-
-
+  
   // On dessine ici la position du joueur
   fill(0, 255, 0);
   ellipse(mapX + (posX-DECALAGES[niveauActuel])*cellSize, mapY + (posY-DECALAGES[niveauActuel])*cellSize, cellSize, cellSize);
@@ -84,6 +96,7 @@ void drawMiniMap() {
   hint(ENABLE_DEPTH_TEST);
 }
 
+// ======= Dessine le detecteur de Momie ============
 void drawMummyDetector() {
   int detectorSize = 100;
   int detectorX = width / 2;
@@ -116,7 +129,7 @@ void drawMummyDetector() {
   noStroke();
 }
 
-
+// ============ Detecte et affiche les momies a proximité ===========
 void detectAndDisplayNearbyMummies(int centerX, int centerY, int detectorSize) {
   float maxDetectionDistance = 150;
 

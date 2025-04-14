@@ -1,19 +1,3 @@
-//==============REGLAGES MOMIE======================
-PShape mummyGroup;  // Le groupe global de la momie
-
-// Paramètres généraux (corps, tête, etc.)
-int numBands   = 5;       // Nombre de bandes spirales
-float angleStep = 0.8;    // Incrément d'angle par anneau
-float bandOffset = 5.0;   // Décalage en angle pour l'épaisseur des bandes
-float stepHeight = 3.0;   // Écart vertical entre les anneaux (hauteur)
-float rGlobal = 30.0;     // Rayon de base
-
-// Système de particules
-ArrayList<Particle> particles = new ArrayList<Particle>();
-
-// Animation Momie
-float armAnim = 0;
-
 // Variables pour la position et le déplacement de la momie
 float mummyPosX = 3.0;  // Position X initiale de la momie dans le labyrinthe (en réalité cette valeur n'est jamais utilisée mais permet de la placer à l'entrée du labyrinthe)
 float mummyPosY = 3.0;  // Position Y initiale de la momie dans le labyrinthe (même remarque qu'en haut)
@@ -44,12 +28,6 @@ void initMummyPosition() {
     }
   }
 
-  /*
-  // Si aucune position valide n'est trouvée, on pourrait utiliser une position par défaut. Bon si on fait ça, ça va mettre la momie au début du labyrinthe...
-   mummyPosX = 3.0;
-   mummyPosY = 3.0;
-   mummyNiveau = 0;
-   */
 }
 
 boolean isValidMummyPosition(float x, float y, int niveau) {

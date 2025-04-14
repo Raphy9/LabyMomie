@@ -6,6 +6,23 @@ final float[] HAUTEURS_NIVEAUX = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180};
 final float HAUTEUR_SOMMET = 200;
 final int[] DECALAGES = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
+// ==== Initialisation des labyrinthes pour chaque niveau ====
+void initLevelLaby() {
+  labyrinthes = new char[NIVEAUX][][];
+  sides = new char[NIVEAUX][][][];
+
+  for (int niveau = 0; niveau < NIVEAUX; niveau++) {
+    labyrinthes[niveau] = new char[LAB_SIZES[niveau]][LAB_SIZES[niveau]];
+    sides[niveau] = new char[LAB_SIZES[niveau]][LAB_SIZES[niveau]][4];
+    genererLabyrinthe(niveau);
+  }
+
+  // Chargement des niveaux
+  for (int niveau = 0; niveau < NIVEAUX; niveau++) {
+    niveauxShapes.add(genererShapeNiveau(niveau));
+  }
+}
+
 void genererLabyrinthe(int niveau) {
   int labSize = LAB_SIZES[niveau];
 

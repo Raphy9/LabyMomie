@@ -3,8 +3,11 @@ import processing.sound.*;
 SoundFile ambiantExterieur;
 SoundFile ambiantInterieur;
 SoundFile reveal;
+SoundFile death;
+SoundFile warp;
+SoundFile button;
 
-int revealDistance = 20;
+int revealDistance = 40;
 
 ArrayList<PShape> niveauxShapes = new ArrayList<PShape>();
 int NIVEAUACTUEL =0;
@@ -50,6 +53,9 @@ void setup() {
   ambiantExterieur = new SoundFile(this, "ambiant_exterieur.mp3");
   ambiantInterieur = new SoundFile(this, "ambiant_interieur.mp3");
   reveal = new SoundFile(this, "reveal.mp3");
+  death = new SoundFile(this, "death.mp3");
+  warp = new SoundFile(this, "warp.mp3");
+  button = new SoundFile(this, "button.mp3");
 
   // Démarre l'ambiance extérieure par défaut en boucle
   ambiantExterieur.loop();

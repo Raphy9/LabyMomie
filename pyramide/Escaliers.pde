@@ -41,6 +41,13 @@ void gererEscaliers() {
 
 // Fonction pour animer la montée/descente des escaliers
 void animerMonteeDescente(int nouveauNiveau, float nouvellePosX, float nouvellePosY) {
+  if (warp.isPlaying()) {
+    warp.stop();
+  }
+  if (!warp.isPlaying()) {
+    warp.play();
+  }
+  
   oldPosX = posX;
   oldPosY = posY;
   oldPosZ = posZ;

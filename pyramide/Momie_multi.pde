@@ -311,16 +311,18 @@ void checkMummyCollisionAt(int niveau) {
   
   if (distance < revealDistance) {
     if (!estExterieur) {
-      if (reveal.isPlaying()) {
-        reveal.stop();
-      }
       if (!reveal.isPlaying()) {
-        reveal.loop();
+        reveal.play();
       }
     } 
   }
   
   if (distance < collisionDistance) {
+    if (!estExterieur) {
+      if (!death.isPlaying()) {
+        death.play();
+      }
+    }
     currentState = 0;
     posX = 1.4;
     posY = 1.0;

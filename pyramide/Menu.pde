@@ -18,6 +18,9 @@ void mousePressed() {
       mouseY > btnY && mouseY < btnY + btnHeight) {
       // Passage à l'état "jeu" qui reprend ta scène exactement où elle en était
       currentState = 1;
+      if (!button.isPlaying()) {
+        button.play();
+      }
     }
   }
 }

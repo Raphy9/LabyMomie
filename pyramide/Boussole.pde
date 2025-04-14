@@ -13,9 +13,9 @@ void drawCompass() {
   pushMatrix();
   drawCompassBody(compassRadius, compassThickness);
   pushMatrix();
-    translate(0, 0, -compassThickness/2.0);
-    // Le cadre de la boussole reste fixe
-    drawCompassFace(compassRadius);
+  translate(0, 0, -compassThickness/2.0);
+  // Le cadre de la boussole reste fixe
+  drawCompassFace(compassRadius);
   popMatrix();
   hint(ENABLE_DEPTH_TEST);
   
@@ -23,16 +23,11 @@ void drawCompass() {
 }
 
 void drawCompassBody(float radius, float thickness) {
-  // On va dessiner un cylindre (en 3D) :
-  //  - le côté circulaire
-  //  - la face du bas
-  //  - la face du haut sera dessinée par la fonction drawCompassFace(...)
-
-  int nbSteps = 60;            // Nombre de segments pour faire le tour du cylindre
+  int nbSteps = 60; // Nombre de segments pour faire le tour du cylindre
   float angleStep = TWO_PI / nbSteps;
   float halfH = thickness/2.0; // Moitié de l’épaisseur (pour dessiner de -halfH à +halfH)
 
-  translate(-width*1.62, height*1.34, 0);
+  translate(-width*1.42, height*1.25, 0);
   fill(150, 100, 50);
   noStroke();
 

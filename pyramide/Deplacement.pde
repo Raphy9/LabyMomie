@@ -29,7 +29,6 @@ void gestionDeplacements() {
 }
 
 void updateRotationAnimation() {
-  // Facteur de lissage
   float smoothing = 0.2;
   float diff = targetAngle - currentAngle;
   

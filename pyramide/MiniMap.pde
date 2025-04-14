@@ -10,11 +10,9 @@ void drawMiniMap() {
   int mapY = 40;
   int cellSize = mapSize / LAB_SIZES[niveauActuel];
   
-  // Background de la mini-carte
   fill(0, 0, 0, 150);
   rect(mapX-10, mapY-10, mapSize+10, mapSize+10);
   
-  // Afficher le niveau actuel
   fill(255);
   text("Niveau: " + niveauActuel, mapX+43, mapY-25);
   
@@ -78,8 +76,90 @@ for (int j = 0; j < LAB_SIZES[niveauActuel]; j++) {
        mapX + (posX-DECALAGES[niveauActuel] + dirX)*cellSize, mapY + (posY-DECALAGES[niveauActuel] + dirY)*cellSize);
   noStroke();
   
-  // On dessine la momie du niveau actuel sur la minimap
-  drawAllMummiesOnMiniMap(mapX, mapY, cellSize);
+  if (niveauActuel == 0) {
+    drawRDCMummyOnMiniMap(mapX, mapY, cellSize);
+  }
+  
+  // Si on est à l'étage 1 ou supérieur, on affiche le détecteur de momie circulaire
+  if (niveauActuel >= 1) {
+    drawMummyDetector();
+  }
   
   hint(ENABLE_DEPTH_TEST);
+}
+
+void drawMummyDetector() {
+  int detectorSize = 100;
+  int detectorX = width / 2;
+  int detectorY = height - detectorSize - 20;
+  
+  // On dessine le fond du détecteur
+  noStroke();
+  fill(0, 0, 0, 150);
+  ellipse(detectorX, detectorY, detectorSize, detectorSize);
+  
+  // On dessine le cercle extérieur du détecteur
+  noFill();
+  stroke(255, 255, 255, 200);
+  strokeWeight(2);
+  ellipse(detectorX, detectorY, detectorSize, detectorSize);
+  
+  // On dessine les lignes de repère
+  stroke(255, 255, 255, 100);
+  strokeWeight(1);
+  line(detectorX - detectorSize/2, detectorY, detectorX + detectorSize/2, detectorY);
+  line(detectorX, detectorY - detectorSize/2, detectorX, detectorY + detectorSize/2);
+  
+  noStroke();
+  fill(0, 255, 0);
+  ellipse(detectorX, detectorY, 5, 5);
+  
+  detectAndDisplayNearbyMummies(detectorX, detectorY, detectorSize);
+  
+  strokeWeight(1);
+  noStroke();
+}
+
+
+void detectAndDisplayNearbyMummies(int centerX, int centerY, int detectorSize) {
+  float maxDetectionDistance = 150;
+  
+  float detectorRadius = detectorSize / 2;
+  
+  // On ne vérifie que la momie de l'étage actuel
+  if (momies[niveauActuel] != null) {
+    Momie momie = momies[niveauActuel];
+    
+    float dx = posX*20 - momie.posX*20;
+    float dy = posY*20 - momie.posY*20;
+    float dz = posZ - HAUTEURS_NIVEAUX[niveauActuel];
+    float distance = sqrt(dx*dx + dy*dy + dz*dz);
+    
+    // Si la momie est à portée de détection
+    if (distance < maxDetectionDistance) {
+      // On calcule la position relative de la momie par rapport au joueur
+      float relativeX = dx / maxDetectionDistance * detectorRadius;
+      float relativeY = dy / maxDetectionDistance * detectorRadius;
+      
+      float mummyX = centerX - relativeX;
+      float mummyY = centerY - relativeY;
+      
+      // On calcule la taille du point en fonction de la distance (plus proche = plus grand)
+      float pointSize = map(distance, 0, maxDetectionDistance, 10, 5);
+      
+      noStroke();
+      fill(255, 0, 255);
+      ellipse(mummyX, mummyY, pointSize, pointSize);
+      
+      if (distance < maxDetectionDistance / 3) {
+        if (frameCount % 10 < 5) {
+          // On dessine un cercle autour du cercle de la momie pour indiquer qu'elle est très proche
+          noFill();
+          stroke(255, 0, 255, 150);
+          strokeWeight(1);
+          ellipse(mummyX, mummyY, pointSize * 2, pointSize * 2);
+        }
+      }
+    }
+  }
 }

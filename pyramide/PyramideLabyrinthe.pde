@@ -48,8 +48,6 @@ PShape lanterneModel;
 float time = 0;
 
 void setup() {
-  
-  // Charger les fichiers audio depuis le dossier data
   ambiantExterieur = new SoundFile(this, "ambiant_exterieur.mp3");
   ambiantInterieur = new SoundFile(this, "ambiant_interieur.mp3");
   reveal = new SoundFile(this, "reveal.mp3");
@@ -57,12 +55,11 @@ void setup() {
   warp = new SoundFile(this, "warp.mp3");
   button = new SoundFile(this, "button.mp3");
 
-  // Démarre l'ambiance extérieure par défaut en boucle
   ambiantExterieur.loop();
   
   frameRate(20);
   randomSeed(2);
-  size(1000, 1000, P3D);
+  size(1000, 830, P3D);
 
   lanterneModel = createTorch3D();
   surface.setTitle("Des momies et des pyramides !");
@@ -80,7 +77,7 @@ void setup() {
   textureCiel = loadImage("ciel.png");
 
   textureMode(NORMAL);
- hauteursSol = new float[TAILLE_DESERT][TAILLE_DESERT];
+  hauteursSol = new float[TAILLE_DESERT][TAILLE_DESERT];
 
   initSandstormShader();
 
@@ -136,6 +133,8 @@ void draw() {
 }
 
 void drawGame() {
+    renderMummy();
+    updateMummy();
   if (!estExterieur) {
     // Si on est à l'intérieur et que le son extérieur joue, on l'arrête
     if (ambiantExterieur.isPlaying()) {
@@ -239,10 +238,8 @@ void drawGame() {
   gestionDeplacements();
   updateRotationAnimation();
 
-  // Mise à jour de toutes les momies
-  updateAllMummies();
+  updateAllPhantomMummies();
 
-  // Vérification des collisions avec les momies
   checkAllMummiesCollision();
 
   perspective(PI/3.0, float(width)/float(height), 1, 1000);
@@ -258,7 +255,7 @@ void drawGame() {
   gestionRenderSol();
 
   renderPyramide();
-
+  
   renderAllMummies();
 
   noTint();
@@ -280,7 +277,7 @@ void drawGame() {
     float offsetX = 700;
     float offsetY = 700;
     if (!estExterieur) {
-      translate(width - offsetX+90, height - offsetY+240, -900);
+      translate(width - offsetX+90, height - offsetY+450, -900);
     }
 
     rotateX(radians(15));
@@ -366,43 +363,6 @@ void configLights() {
     ambientLight(r, g, b, lx-8, ly, lz);
   }
 }
-
-PShape creerTorche(PApplet p) {
-  // Crée un groupe de shapes pour contenir la torche complète
-  PShape torche = p.createShape(PShape.GROUP);
-
-  // --- Création du manche de la torche ---
-  PShape manche = p.createShape();
-  manche.beginShape();
-  manche.fill(139, 69, 19); // Couleur brun (valeurs au format RGB)
-  manche.noStroke();
-
-  // On crée un manche conique vu de face
-  manche.vertex(-5, 0);
-  manche.vertex(5, 0);
-  manche.vertex(8, -80);
-  manche.vertex(-8, -80);
-
-  manche.endShape(CLOSE);
-
-  PShape flamme = p.createShape();
-  flamme.beginShape();
-  flamme.fill(255, 140, 0); // Orange
-  flamme.noStroke();
-
-  // Forme de flamme
-  flamme.vertex(0, -80);
-  flamme.bezierVertex(10, -120, 20, -100, 0, -140);
-  flamme.bezierVertex(-20, -100, -10, -120, 0, -80);
-
-  flamme.endShape(CLOSE);
-
-  torche.addChild(manche);
-  torche.addChild(flamme);
-
-  return torche;
-}
-
 
 // Fonction d'easing pour un mouvement plus naturel
 float easeInOutQuad(float t) {

@@ -1,4 +1,4 @@
-// ===== Structure Momie fantome ==========
+// Structure pour stocker les informations d'une momie fantôme
 class Momie {
   float posX;      // Position X dans le labyrinthe
   float posY;      // Position Y dans le labyrinthe
@@ -19,10 +19,11 @@ class Momie {
 
 Momie[] momies;
 
-// ===== Initialisation des momies fantômes ======
+// Initialisation des momies fantômes (une par niveau)
 void initMomies() {
   momies = new Momie[NIVEAUX];
 
+  // Initialiser chaque momie avec une position valide dans son niveau
   for (int niveau = 0; niveau < NIVEAUX; niveau++) {
     // On essaie plusieurs positions jusqu'à en trouver une valide
     boolean positionTrouvee = false;
@@ -51,7 +52,7 @@ void initMomies() {
       float dirX = cos(angle);
       float dirY = sin(angle);
 
-      // Par défaut au milieu du labyrinthe
+      // Position par défaut au milieu du labyrinthe
       float posX = LAB_SIZES[niveau]/2 + DECALAGES[niveau];
       float posY = LAB_SIZES[niveau]/2 + DECALAGES[niveau];
 
@@ -69,7 +70,6 @@ void initMomies() {
   }
 }
 
-// ===== Maj les momies fantômes ======
 void updateAllPhantomMummies() {
   // Mettre à jour chaque momie
   for (int i = 0; i < NIVEAUX; i++) {
@@ -88,7 +88,7 @@ void updateAllPhantomMummies() {
 }
 
 
-// ===== Maj une momies fantômes spécifique ======
+// Mise à jour d'une momie spécifique
 void updateMummyAt(int niveau) {
   Momie momie = momies[niveau];
   if (momie == null) return;
@@ -133,6 +133,7 @@ void updateMummyAt(int niveau) {
       canMove = false;
     }
   } else {
+    // Vérification plus précise pour éviter de traverser les murs
     float margin = 0.3; // Marge pour éviter de traverser les murs
 
     // Vérifier les cellules adjacentes
@@ -171,7 +172,6 @@ void updateMummyAt(int niveau) {
   }
 }
 
-// ===== Verifie si la momie fantôme est dehors ======
 boolean checkIfGhostMummyOutsideAt(int niveau) {
   Momie momie = momies[niveau];
   if (momie == null) return false;
@@ -195,7 +195,7 @@ boolean checkIfGhostMummyOutsideAt(int niveau) {
   return false;
 }
 
-// ===== Repositionne la momie fantôme à une position valide =========
+// On repositionne une momie fantôme (étage 1 et supérieur) à une position valide dans son niveau
 void repositionGhostMummyAt(int niveau) {
   // On essaie plusieurs positions jusqu'à en trouver une valide
   for (int i = 6; i < LAB_SIZES[niveau] - 1; i++) {
@@ -227,7 +227,6 @@ void checkAllMummiesCollision() {
   }
 }
 
-// ===== Verifie la collision avec les momies fantômes ======
 void checkMummyCollisionAt(int niveau) {
   Momie momie = momies[niveau];
   if (momie == null) return;

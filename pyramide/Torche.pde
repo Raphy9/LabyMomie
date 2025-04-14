@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// ========== Crée un PShape de torche =============
-=======
->>>>>>> parent of 4220c78 (Structure code)
 PShape createTorch3D() {
   PShape torch = createShape(GROUP);
   
@@ -19,7 +15,7 @@ PShape createTorch3D() {
   handle.setStroke(false);
   torch.addChild(handle);
 
-  // 2) Bout de la torche
+  // 2) Collier (anneau) près du sommet
   PVector[] ringProfile = {
     new PVector(4, 120),  // Doit coller à la fin du manche
     new PVector(6, 125),  // Légèrement plus large
@@ -39,10 +35,6 @@ PShape createTorch3D() {
   return torch;
 }
 
-<<<<<<< HEAD
-// ==== Update les flammes de la torche =====
-=======
->>>>>>> parent of 4220c78 (Structure code)
 void updateAndRenderFlame() {
   pushMatrix();
   // Si nécessaire, adapte une translation pour que la flamme s'aligne avec le haut de la torche.
@@ -57,7 +49,6 @@ void updateAndRenderFlame() {
   popMatrix();
 }
 
-// ======== Constructeur pour les formes de la torche ============
 PShape revolveShape(PVector[] profile, int revolveDetail) {
   PShape shape3D = createShape();
   shape3D.beginShape(QUADS);
@@ -119,10 +110,6 @@ PShape revolveShape(PVector[] profile, int revolveDetail) {
 PShape createFlamme3D() {
   // Création du groupe qui contiendra les particules
   PShape flameGroup = createShape(GROUP);
-<<<<<<< HEAD
-  int numParticles = 800; // Nombre de particules
-=======
->>>>>>> parent of 4220c78 (Structure code)
   
   // Nombre de particules que l'on souhaite générer
   int numParticles = 800;
@@ -131,13 +118,9 @@ PShape createFlamme3D() {
   // Ici, la flamme sera située entre y = 150 et y = 220,
   // avec x variant approximativement de -20 à 20 et z de -4 à 4.
   for (int i = 0; i < numParticles; i++) {
-<<<<<<< HEAD
-    float particleSize = random(1, 3);
-=======
     // Taille aléatoire pour la particule (pour varier l'aspect du feu)
     float particleSize = random(1, 3);
     // Création d'une sphère pour représenter la particule
->>>>>>> parent of 4220c78 (Structure code)
     PShape particle = createShape(SPHERE, particleSize);
     
     // Couleur de base : un orange vif, avec une légère variation aléatoire dans le canal vert
